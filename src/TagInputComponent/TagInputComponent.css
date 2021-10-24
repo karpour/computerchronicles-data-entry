@@ -1,0 +1,12 @@
+.tag-input-component-tag {
+    border: 1px solid black;
+    padding: 0.2em;
+    margin-right: 0.2em;
+    margin-bottom: 0.2em;
+    display: inline-block;
+}
+
+.tag-input-component-input {
+    display: inline-block;
+    width: 100%;
+}

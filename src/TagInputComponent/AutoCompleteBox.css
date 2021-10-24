@@ -1,0 +1,11 @@
+.auto-complete-box {
+    border: 2px solid white;
+}
+
+.auto-complete-box div {
+    border: 1px solid black;
+}
+
+.auto-complete-box div:hover {
+    background-color: aqua;
+}

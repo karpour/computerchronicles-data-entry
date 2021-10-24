@@ -1,5 +1,5 @@
 {
-  "name": "react-data-entry",
+  "name": "computerchronicles-data-entry",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
@@ -11,6 +11,7 @@
     "@types/react": "^17.0.3",
     "@types/react-dom": "^17.0.2",
     "react": "^17.0.1",
+    "react-autocomplete-tag": "^1.2.0",
     "react-dom": "^17.0.1",
     "react-scripts": "4.0.3",
     "typescript": "^4.2.3",

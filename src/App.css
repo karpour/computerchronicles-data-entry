@@ -1,38 +1,191 @@
-.App {
-  text-align: center;
+:root {
+  --text-light: rgb(252, 251, 231);
+  --element-title: rgb(199, 199, 243);
+  --element-background: rgb(24, 24, 27);
+  --tag-background: rgb(60, 60, 73);
+  --tag-delete-background: rgb(30, 30, 37);
+  --tag-border: rgb(102, 102, 129);
+  --tag-text-input-bg: rgb(186, 186, 223);
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+.grid-container {
+  max-width: 95%;
+  margin-top: 1em;
+  margin-left: auto;
+  margin-right: auto;
+  display: grid;
+  color: var(--element-title);
+  grid-template-columns: auto auto auto;
+  grid-template-rows: auto auto auto auto;
+  gap: 0.5em 0.5em;
+  grid-template-areas: "header header dates" "hosts video tags" "hosts video products" "description description products";
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
+.grid-element {
+  background-color: var(--element-background);
+  border-radius: 0.3em;
+  padding: 0.5em;
 }
 
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
+.grid-element h2 {
+  background-color: rgb(80, 60, 134);
+}
+
+.spacer {
+  padding-bottom: 1em;
+}
+
+.dual-field-text-input {
+  padding-top: 0.5em;
+  display: flex;
+  flex-direction: row;
+  width: auto;
+}
+
+.dual-field-text-input input {
+  display: flex;
+  flex-grow: 1;
+  flex-shrink: 1;
+  min-width: 2em;
+  margin-right: 5px;
+}
+
+.dual-field-text-input button {
+  display: flex;
+  flex-grow: 1;
+  flex-shrink: 1;
+  min-width: 1.5em;
+}
+
+.grid-container div h2 {
+  margin-top: 0;
+  padding-left: 0.2em;
+  margin-bottom: 0.5em;
+  font-size: medium;
+}
+
+.header {
+  grid-area: header;
+}
+
+.header h1 {
+  padding: 0.1em;
+  margin: 0;
+  font-size: 3em;
+}
+
+.hosts {
+  grid-area: hosts;
+  min-width: 10em;
+}
+
+.tags {
+  grid-area: tags;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
+}
+
+.tags textarea {
+  width: 100%;
+  flex-grow: 1;
+}
+
+.video {
+  grid-area: video;
+}
+
+.video iframe {
+  display: block;
+  width: 800px;
+  min-height: 600px;
+  height: auto;
+}
+
+.products {
+  grid-area: products;
+}
+
+.description {
+  grid-area: description;
+  display: flex;
+  flex-direction: column;
+}
+
+.description textarea {
+  display: flex;
+  flex-grow: 1;
+  min-height: 6em;
+}
+
+iframe {
+  border: 0;
+}
+
+.video-checkbox {
+  display: inline-block;
+  margin: 0.5em;
+  margin-right: 2em;
+}
+
+.ia-identifier {
+  margin: 0.5em;
+  float: right;
+}
+
+/** Tag stuff **/
+
+.episode-tags {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.episode-tags ul {
+  list-style-type: none;
+  flex-grow: 1;
+  margin: 0;
+  padding: 0;
+  display: inline;
+}
+
+.episode-tags ul li {
+  border: 1px solid;
+  border-radius: 2px;
+  border-color: var(--tag-border);
+  background-color: var(--tag-background);
+  padding: 0.1em;
+  padding-left: 0.3em;
+  margin: 2px;
+  display: inline-block;
+}
+
+.tag-delete-x {
   color: white;
+  background-color: var(--tag-delete-background);
+  border: 0;
+  border-radius: 2px;
+  padding: 0;
+  padding-left: 0.2em;
+  padding-right: 0.2em;
+  margin: 2px;
+  display: inline-block;
+  cursor: pointer;
 }
 
-.App-link {
-  color: #61dafb;
+.episode-tags .tag-text-input {
+  margin-top: 0.5em;
+  background-color: var(--tag-text-input-bg);
+  border: 1px solid var(--tag-border);
+  font-size: larger;
+  border-radius: 2px;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.dates {
+  display: flex;
+  flex-direction: row;
+}
+
+.dates .date-container {
+  flex-grow: 1;
+  margin-right: 0.5em;
 }
