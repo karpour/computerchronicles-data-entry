@@ -67,7 +67,7 @@ class TagComponent extends Component<TagComponentProps, TagComponentState> {
 
     protected handleInput(e: FormEvent<HTMLInputElement>) {
         console.log(e);
-        let t = (e as any).target.value;
+        //let t = (e as any).target.value;
         if (this.keyPress === false) {
             //console.log("Adding tag from handleSelectAutoCompleteTag");
             //this.addTag(t);
@@ -81,10 +81,10 @@ class TagComponent extends Component<TagComponentProps, TagComponentState> {
             return (
                 <li key={idx} className="tag-chosen">
                     <span className="tag-chosen-text">{tag}</span>
-                    <button
+                    {this.props.editable && (<button
                         className="tag-delete-x"
                         onClick={() => this.props.onDeleteTag(idx)}
-                    >×</button>
+                    >×</button>)}
                 </li>
             );
         });

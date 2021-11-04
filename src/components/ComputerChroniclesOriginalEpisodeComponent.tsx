@@ -3,16 +3,18 @@ import VideoPlayer from './VideoPlayer';
 import React, { ChangeEvent } from 'react';
 import TagComponent from './TagComponent';
 import DualFieldComponent from './DualFieldComponent';
-import { ComputerChroniclesEpisodeIssues, ComputerChroniclesFeaturedProduct, ComputerChroniclesGuest, ComputerChroniclesLocation, ComputerChroniclesOriginalEpisodeMetadata } from '../ComputerChroniclesEpisodeMetadata';
+import { ComputerChroniclesEpisodeIssues, ComputerChroniclesEpisodeStatus, ComputerChroniclesFeaturedProduct, ComputerChroniclesGuest, ComputerChroniclesLocation, ComputerChroniclesOriginalEpisodeMetadata, COMPUTERCHRONICLES_EPISODE_STATUSES } from '../ccapi/ComputerChroniclesEpisodeMetadata';
 
 type ComputerChroniclesOriginalEpisodeComponentProps = {
   episodeData: ComputerChroniclesOriginalEpisodeMetadata;
+  onCancel: () => void;
   onSaveEpisodeData: (newData: ComputerChroniclesOriginalEpisodeMetadata) => void;
 };
 
 type ComputerChroniclesOriginalEpisodeComponentState = {
   episodeData: ComputerChroniclesOriginalEpisodeMetadata;
   editable: boolean;
+  selectedStatus: ComputerChroniclesEpisodeStatus | "";
 };
 
 class ComputerChroniclesOriginalEpisodeComponent extends React.Component<ComputerChroniclesOriginalEpisodeComponentProps, ComputerChroniclesOriginalEpisodeComponentState> {
@@ -21,7 +23,8 @@ class ComputerChroniclesOriginalEpisodeComponent extends React.Component<Compute
     super(props);
     this.state = {
       episodeData: props.episodeData,
-      editable: true
+      editable: true,
+      selectedStatus: ""
     };
   }
 
@@ -115,7 +118,24 @@ class ComputerChroniclesOriginalEpisodeComponent extends React.Component<Compute
     });
   }
 
+  protected handleEpisodeStatusChange(e: ChangeEvent<HTMLSelectElement>) {
+    console.log(e.target.value);
+    this.setState({ selectedStatus: e.target.value as any });
+  }
+
+  protected handleSave() {
+    if (this.state.selectedStatus !== "") {
+      this.props.onSaveEpisodeData(this.state.episodeData);
+    } else {
+      window.alert("Select Episode Status first");
+    }
+  }
+
   public render() {
+    const statusOptions: JSX.Element[] = COMPUTERCHRONICLES_EPISODE_STATUSES.map(
+      s => <option value={s}>{s}</option>
+    );
+
     return (
       <div className="grid-container">
         <div className="header grid-element">
@@ -185,6 +205,7 @@ class ComputerChroniclesOriginalEpisodeComponent extends React.Component<Compute
           issues={this.state.episodeData.issues ?? {}}
           iaIdentifier={this.state.episodeData.iaIdentifier ?? "<missing video>"}
           onIssuesUpdate={this.handleIssuesUpdate.bind(this)}
+          editable={this.state.editable}
         />
 
         <div className="dates grid-element">
@@ -247,6 +268,26 @@ class ComputerChroniclesOriginalEpisodeComponent extends React.Component<Compute
             onChange={this.handleDescriptionChange.bind(this)}
           />
         </div>
+
+        {this.state.editable && (
+          <div className="cancel-save grid-element">
+            <select name="status"
+              id="status-select"
+              className={`select-status ${this.state.selectedStatus === "" ? " unselected-status" : ""}`}
+              value={this.state.selectedStatus}
+              onChange={this.handleEpisodeStatusChange.bind(this)}>
+              {this.state.selectedStatus === "" && (<option value="">SELECT STATUS</option>)}
+              {statusOptions}
+            </select>
+            <button className="cancel-button" onClick={this.props.onCancel}>CANCEL</button>
+            <button className="save-button" onClick={this.handleSave.bind(this)}>SAVE</button>
+          </div>
+        )}
+
+
+        <div className="blank">
+        </div>
+
       </div>
     );
   }

@@ -1,9 +1,10 @@
 import { ChangeEvent, Component } from "react";
-import { ComputerChroniclesEpisodeIssues } from "../ComputerChroniclesEpisodeMetadata";
+import { ComputerChroniclesEpisodeIssues } from "../ccapi/ComputerChroniclesEpisodeMetadata";
 
 type VideoPlayerProps = {
     videoId: string | null;
     issues: ComputerChroniclesEpisodeIssues;
+    editable: boolean;
     iaIdentifier: string;
     onIssuesUpdate: (issues: ComputerChroniclesEpisodeIssues) => void;
 };
@@ -28,15 +29,15 @@ class VideoPlayer extends Component<VideoPlayerProps> {
             <iframe title="video" src={"https://archive.org/embed/" + this.props.videoId}></iframe>
 
             <div className="video-checkbox">
-                <input type="checkbox" id="videoIssues" name="videoIssues" onChange={this.handleCheckBoxClick.bind(this)} checked={this.props.issues.videoIssues}></input>
+                <input type="checkbox" id="videoIssues" name="videoIssues" onChange={this.handleCheckBoxClick.bind(this)} checked={this.props.issues.videoIssues} disabled={!this.props.editable}></input>
                 <label htmlFor="videoIssues">Video issues</label>
             </div>
             <div className="video-checkbox">
-                <input type="checkbox" id="audioIssues" name="audioIssues" onChange={this.handleCheckBoxClick.bind(this)} checked={this.props.issues.audioIssues}></input>
+                <input type="checkbox" id="audioIssues" name="audioIssues" onChange={this.handleCheckBoxClick.bind(this)} checked={this.props.issues.audioIssues} disabled={!this.props.editable}></input>
                 <label htmlFor="audioIssues">Audio issues</label>
             </div>
             <div className="video-checkbox">
-                <input type="checkbox" id="noAudio" name="noAudio" onChange={this.handleCheckBoxClick.bind(this)} checked={this.props.issues.noAudio}></input>
+                <input type="checkbox" id="noAudio" name="noAudio" onChange={this.handleCheckBoxClick.bind(this)} checked={this.props.issues.noAudio} disabled={!this.props.editable}></input>
                 <label htmlFor="noAudio">No Audio</label>
             </div>
             <div className="ia-identifier"><b>{this.props.iaIdentifier}</b></div>

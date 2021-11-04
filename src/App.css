@@ -1,191 +1,338 @@
 :root {
-  --text-light: rgb(252, 251, 231);
-  --element-title: rgb(199, 199, 243);
-  --element-background: rgb(24, 24, 27);
-  --tag-background: rgb(60, 60, 73);
-  --tag-delete-background: rgb(30, 30, 37);
-  --tag-border: rgb(102, 102, 129);
-  --tag-text-input-bg: rgb(186, 186, 223);
+    --text-light: rgb(252, 251, 231);
+    --element-title: rgb(199, 199, 243);
+    --element-background: rgb(24, 24, 27);
+    --input-background: rgb(47, 47, 56);
+    --input-border: rgb(162, 162, 224);
+    --input-text-color: rgb(255, 255, 255);
+    --element-background-lighter: rgb(44, 44, 49);
+    --tag-background: rgb(60, 60, 73);
+    --tag-delete-background: rgb(30, 30, 37);
+    --tag-border: rgb(102, 102, 129);
+    --tag-text-input-bg: rgb(186, 186, 223);
+    --original-episode-number: rgb(13, 102, 7);
+    --rerun-episode-number: rgb(84, 90, 83);
+    --rerun-unknown-episode-number: rgb(80, 50, 50);
+    --episode-status-unknown: rgb(53, 51, 51);
+    --episode-status-needswork: rgb(150, 97, 0);
+    --episode-status-review: rgb(109, 177, 20);
+    --episode-status-done: rgb(13, 102, 7);
+}
+
+a {
+    color: white;
+}
+
+textarea,
+input,
+select {
+    background: var(--input-background);
+    border: 1px solid var(--input-border);
+    color: var(--input-text-color);
+}
+
+.select-status {
+    font-size: large;
+    border-radius: 0.3em;
+    margin: 0.2em;
+    flex-grow: 1;
+}
+
+.unselected-status {
+    border: 4px solid red;
+}
+
+.cancel-save {
+    grid-area: footer;
+    display: flex;
+    justify-content: right;
+}
+
+.cancel-save button {
+    font-size: large;
+    border-radius: 0.3em;
+    margin: 0.2em;
+}
+
+.save-button {
+    background-color: rgb(109, 177, 20);
+    border-color: rgb(109, 177, 20);
+}
+
+.cancel-button {
+    background-color: rgb(228, 105, 89);
+    border-color: rgb(228, 105, 89);
+}
+
+.main {
+    width: 800px;
+    margin: auto;
+    margin-top: 2em;
+}
+
+.season-separator {
+    margin-top: 2em;
+}
+
+.episode-list-header {
+    color: white;
+    background-color: var(--element-background);
+    border-radius: 0.3em;
+    padding: 1em;
+    margin-bottom: 1em;
+}
+
+.episode-list-container {
+    color: white;
+}
+
+.episode-list-item {
+    background-color: var(--element-background);
+    border-radius: 0.3em;
+    width: fit-content;
+    height: fit-content;
+    margin-bottom: 0.5em;
+    cursor: pointer;
+}
+
+.episode-list-item:hover {
+    background-color: var(--element-background-lighter);
+}
+
+.episode-list-number {
+    background-color: var(--original-episode-number);
+    padding: 0.3em 0.1em;
+    text-align: center;
+    margin-left: 0.5em;
+    margin-right: 0.5em;
+    width: 4em;
+    display: inline-block;
+}
+
+.episode-list-title {
+    display: inline-block;
+    width: 70%;
+}
+
+.episode-status {
+    padding: 0.3em 0.1em;
+    text-align: center;
+    margin-left: 0.5em;
+    margin-right: 0.5em;
+    width: 6em;
+    display: inline-block;
+}
+
+.episode-status-unknown {
+    background-color: var(--episode-status-unknown);
+}
+
+.episode-status-done {
+    background-color: var(--episode-status-done);
+}
+
+.episode-status-review {
+    background-color: var(--episode-status-review);
+}
+
+.episode-status-needswork {
+    background-color: var(--episode-status-needswork);
+}
+
+.rerun {
+    background-color: var(--rerun-episode-number);
+}
+
+.rerun-unknown {
+    background-color: var(--rerun-unknown-episode-number);
+}
+
+.episode-list-number::before {
+    content: "CC";
 }
 
 .grid-container {
-  max-width: 95%;
-  margin-top: 1em;
-  margin-left: auto;
-  margin-right: auto;
-  display: grid;
-  color: var(--element-title);
-  grid-template-columns: auto auto auto;
-  grid-template-rows: auto auto auto auto;
-  gap: 0.5em 0.5em;
-  grid-template-areas: "header header dates" "hosts video tags" "hosts video products" "description description products";
+    max-width: 95%;
+    margin-top: 1em;
+    margin-bottom: 3em;
+    margin-left: auto;
+    margin-right: auto;
+    display: grid;
+    color: var(--element-title);
+    grid-template-columns: auto auto auto;
+    grid-template-rows: auto auto auto auto auto;
+    gap: 0.5em 0.5em;
+    grid-template-areas: "header header dates" "hosts video tags" "hosts video products" "description description products" "blank blank footer";
+}
+
+.blank {
+    grid-area: blank;
 }
 
 .grid-element {
-  background-color: var(--element-background);
-  border-radius: 0.3em;
-  padding: 0.5em;
+    background-color: var(--element-background);
+    border-radius: 0.3em;
+    padding: 0.5em;
 }
 
 .grid-element h2 {
-  background-color: rgb(80, 60, 134);
+    background-color: rgb(80, 60, 134);
 }
 
 .spacer {
-  padding-bottom: 1em;
+    padding-bottom: 1em;
 }
 
 .dual-field-text-input {
-  padding-top: 0.5em;
-  display: flex;
-  flex-direction: row;
-  width: auto;
+    padding-top: 0.5em;
+    display: flex;
+    flex-direction: row;
+    width: auto;
 }
 
 .dual-field-text-input input {
-  display: flex;
-  flex-grow: 1;
-  flex-shrink: 1;
-  min-width: 2em;
-  margin-right: 5px;
+    display: flex;
+    flex-grow: 1;
+    flex-shrink: 1;
+    min-width: 2em;
+    margin-right: 5px;
 }
 
 .dual-field-text-input button {
-  display: flex;
-  flex-grow: 1;
-  flex-shrink: 1;
-  min-width: 1.5em;
+    display: flex;
+    flex-grow: 1;
+    flex-shrink: 1;
+    min-width: 1.5em;
 }
 
 .grid-container div h2 {
-  margin-top: 0;
-  padding-left: 0.2em;
-  margin-bottom: 0.5em;
-  font-size: medium;
+    margin-top: 0;
+    padding-left: 0.2em;
+    margin-bottom: 0.5em;
+    font-size: medium;
 }
 
 .header {
-  grid-area: header;
+    grid-area: header;
 }
 
 .header h1 {
-  padding: 0.1em;
-  margin: 0;
-  font-size: 3em;
+    padding: 0.1em;
+    margin: 0;
+    font-size: 3em;
 }
 
 .hosts {
-  grid-area: hosts;
-  min-width: 10em;
+    grid-area: hosts;
+    min-width: 18em;
 }
 
 .tags {
-  grid-area: tags;
-  display: flex;
-  flex-direction: column;
+    grid-area: tags;
+    display: flex;
+    flex-direction: column;
 }
 
 .tags textarea {
-  width: 100%;
-  flex-grow: 1;
+    width: 100%;
+    flex-grow: 1;
 }
 
 .video {
-  grid-area: video;
+    grid-area: video;
 }
 
 .video iframe {
-  display: block;
-  width: 800px;
-  min-height: 600px;
-  height: auto;
+    display: block;
+    width: 800px;
+    min-height: 600px;
+    height: auto;
 }
 
 .products {
-  grid-area: products;
+    grid-area: products;
 }
 
 .description {
-  grid-area: description;
-  display: flex;
-  flex-direction: column;
+    grid-area: description;
+    display: flex;
+    flex-direction: column;
 }
 
 .description textarea {
-  display: flex;
-  flex-grow: 1;
-  min-height: 6em;
+    display: flex;
+    flex-grow: 1;
+    min-height: 6em;
 }
 
 iframe {
-  border: 0;
+    border: 0;
 }
 
 .video-checkbox {
-  display: inline-block;
-  margin: 0.5em;
-  margin-right: 2em;
+    display: inline-block;
+    margin: 0.5em;
+    margin-right: 2em;
 }
 
 .ia-identifier {
-  margin: 0.5em;
-  float: right;
+    margin: 0.5em;
+    float: right;
 }
+
 
 /** Tag stuff **/
 
 .episode-tags {
-  flex-grow: 1;
-  display: flex;
-  flex-direction: column;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
 }
 
 .episode-tags ul {
-  list-style-type: none;
-  flex-grow: 1;
-  margin: 0;
-  padding: 0;
-  display: inline;
+    list-style-type: none;
+    flex-grow: 1;
+    margin: 0;
+    padding: 0;
+    display: inline;
 }
 
 .episode-tags ul li {
-  border: 1px solid;
-  border-radius: 2px;
-  border-color: var(--tag-border);
-  background-color: var(--tag-background);
-  padding: 0.1em;
-  padding-left: 0.3em;
-  margin: 2px;
-  display: inline-block;
+    border: 1px solid;
+    border-radius: 2px;
+    border-color: var(--tag-border);
+    background-color: var(--tag-background);
+    padding: 0.1em;
+    padding-left: 0.3em;
+    margin: 2px;
+    display: inline-block;
 }
 
 .tag-delete-x {
-  color: white;
-  background-color: var(--tag-delete-background);
-  border: 0;
-  border-radius: 2px;
-  padding: 0;
-  padding-left: 0.2em;
-  padding-right: 0.2em;
-  margin: 2px;
-  display: inline-block;
-  cursor: pointer;
+    color: white;
+    background-color: var(--tag-delete-background);
+    border: 0;
+    border-radius: 2px;
+    padding: 0;
+    padding-left: 0.2em;
+    padding-right: 0.2em;
+    margin: 2px;
+    display: inline-block;
+    cursor: pointer;
 }
 
 .episode-tags .tag-text-input {
-  margin-top: 0.5em;
-  background-color: var(--tag-text-input-bg);
-  border: 1px solid var(--tag-border);
-  font-size: larger;
-  border-radius: 2px;
+    margin-top: 0.5em;
+    font-size: larger;
+    border-radius: 2px;
 }
 
 .dates {
-  display: flex;
-  flex-direction: row;
+    display: flex;
+    flex-direction: row;
 }
 
 .dates .date-container {
-  flex-grow: 1;
-  margin-right: 0.5em;
+    flex-grow: 1;
+    margin-right: 0.5em;
 }

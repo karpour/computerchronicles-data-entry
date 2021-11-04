@@ -90,11 +90,17 @@ class DualFieldComponent<ObjectType extends TwoStringValuesObject<ObjectType, Fi
 
     public render() {
 
+
+
         const btnName = `${this.props.name}-add-button`;
 
         let fieldElements: JSX.Element[] = this.props.fields.map(
             (field, idx) => {
-                return (<div><b>{field[this.props.fieldName1]}</b> {field[this.props.fieldName2] ? "| " + field[this.props.fieldName2] : ""} {this.props.canAddOrRemoveFields && (<button
+                let separator: string = "";
+                if (field[this.props.fieldName1] && field[this.props.fieldName2]) {
+                    separator = " | "
+                }
+                return (<div><b>{field[this.props.fieldName1]}</b>{separator}{field[this.props.fieldName2]} {this.props.canAddOrRemoveFields && (<button
                     className="tag-delete-x"
                     onClick={() => this.props.onFieldChanged(idx, null)}
                 >×</button>)}</div>);
