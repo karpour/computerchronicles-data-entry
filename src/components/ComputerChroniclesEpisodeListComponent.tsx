@@ -34,7 +34,7 @@ export default class ComputerChroniclesEpisodeListComponent extends Component<Co
                 }
 
                 return (
-                    <div className={`episode-list-item${seasonChange ? " season-separator" : ""}`} id={`CC${episode.episodeNumber}`} onClick={() => this.props.onSelectEpisode(episode.episodeNumber)}>
+                    <div className={`episode-list-item${seasonChange ? " season-separator" : ""}`} key={`CC${episode.episodeNumber}`} onClick={() => this.props.onSelectEpisode(episode.episodeNumber)}>
                         <span className={`episode-list-number ${rerunTag}`}>{episode.episodeNumber}</span>
                         <span className="episode-list-title">{title}</span>
                         <span className={`episode-status episode-status-${episode.status}`}>{episode.status}</span>

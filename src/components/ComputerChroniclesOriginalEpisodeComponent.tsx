@@ -8,12 +8,12 @@ import { ComputerChroniclesEpisodeIssues, ComputerChroniclesEpisodeStatus, Compu
 type ComputerChroniclesOriginalEpisodeComponentProps = {
   episodeData: ComputerChroniclesOriginalEpisodeMetadata;
   onCancel: () => void;
+  editable: boolean;
   onSaveEpisodeData: (newData: ComputerChroniclesOriginalEpisodeMetadata) => void;
 };
 
 type ComputerChroniclesOriginalEpisodeComponentState = {
   episodeData: ComputerChroniclesOriginalEpisodeMetadata;
-  editable: boolean;
   selectedStatus: ComputerChroniclesEpisodeStatus | "";
 };
 
@@ -23,7 +23,6 @@ class ComputerChroniclesOriginalEpisodeComponent extends React.Component<Compute
     super(props);
     this.state = {
       episodeData: props.episodeData,
-      editable: true,
       selectedStatus: ""
     };
   }
@@ -119,7 +118,7 @@ class ComputerChroniclesOriginalEpisodeComponent extends React.Component<Compute
   }
 
   protected handleEpisodeStatusChange(e: ChangeEvent<HTMLSelectElement>) {
-    console.log(e.target.value);
+    this.setEpisodeState({ status: e.target.value as any });
     this.setState({ selectedStatus: e.target.value as any });
   }
 
@@ -152,7 +151,7 @@ class ComputerChroniclesOriginalEpisodeComponent extends React.Component<Compute
             fieldName2="role"
             maxItems={1}
             fields={this.state.episodeData.host ? [this.state.episodeData.host] : []}
-            canAddOrRemoveFields={this.state.editable}
+            canAddOrRemoveFields={this.props.editable}
             onFieldChanged={this.handleHostFieldChanged.bind(this)}
           />
 
@@ -166,7 +165,7 @@ class ComputerChroniclesOriginalEpisodeComponent extends React.Component<Compute
             fieldName1="name"
             fieldName2="role"
             fields={this.state.episodeData.coHosts}
-            canAddOrRemoveFields={this.state.editable}
+            canAddOrRemoveFields={this.props.editable}
             onFieldChanged={this.handleCoHostFieldChanged.bind(this)}
           />
 
@@ -180,7 +179,7 @@ class ComputerChroniclesOriginalEpisodeComponent extends React.Component<Compute
             fieldName1="name"
             fieldName2="role"
             fields={this.state.episodeData.guests}
-            canAddOrRemoveFields={this.state.editable}
+            canAddOrRemoveFields={this.props.editable}
             onFieldChanged={this.handleGuestFieldChanged.bind(this)}
           />
         </div>
@@ -190,7 +189,7 @@ class ComputerChroniclesOriginalEpisodeComponent extends React.Component<Compute
           <h2>Tags</h2>
           <TagComponent
             name="episode-tags"
-            editable={this.state.editable}
+            editable={this.props.editable}
             autoCompleteSuggestions={["Computer", "Chronicles"]}
             onTagChange={this.handleEpisodeTagChange.bind(this)}
             onAddTag={this.handleEpisodeTagAdd.bind(this)}
@@ -205,14 +204,14 @@ class ComputerChroniclesOriginalEpisodeComponent extends React.Component<Compute
           issues={this.state.episodeData.issues ?? {}}
           iaIdentifier={this.state.episodeData.iaIdentifier ?? "<missing video>"}
           onIssuesUpdate={this.handleIssuesUpdate.bind(this)}
-          editable={this.state.editable}
+          editable={this.props.editable}
         />
 
         <div className="dates grid-element">
           <div className="date-container">
             <h2><label htmlFor="airDate">Airing date</label></h2>
             <input type="date" id="airDate" name="airDate"
-              readOnly={!this.state.editable}
+              readOnly={!this.props.editable}
               value={this.state.episodeData.airingDate}
               min={this.state.episodeData.productionDate ? this.state.episodeData.productionDate : "1983-01-01"}
               max="2003-01-01"
@@ -223,7 +222,7 @@ class ComputerChroniclesOriginalEpisodeComponent extends React.Component<Compute
           <div className="date-container">
             <h2><label htmlFor="prodDate">Production date</label></h2>
             <input type="date" id="prodDate" name="prodDate"
-              readOnly={!this.state.editable}
+              readOnly={!this.props.editable}
               value={this.state.episodeData.productionDate}
               min="1983-01-01"
               max="2003-01-01"
@@ -241,7 +240,7 @@ class ComputerChroniclesOriginalEpisodeComponent extends React.Component<Compute
             fieldName1="company"
             fieldName2="product"
             fields={this.state.episodeData.featuredProducts}
-            canAddOrRemoveFields={this.state.editable}
+            canAddOrRemoveFields={this.props.editable}
             onFieldChanged={this.handleFeaturedProductFieldChanged.bind(this)}
           />
 
@@ -255,7 +254,7 @@ class ComputerChroniclesOriginalEpisodeComponent extends React.Component<Compute
             fieldName1="name"
             fieldName2="location"
             fields={this.state.episodeData.locations}
-            canAddOrRemoveFields={this.state.editable}
+            canAddOrRemoveFields={this.props.editable}
             onFieldChanged={this.handleLocationChanged.bind(this)}
           />
         </div>
@@ -263,13 +262,13 @@ class ComputerChroniclesOriginalEpisodeComponent extends React.Component<Compute
         <div className="description grid-element">
           <h2>Description</h2>
           <textarea
-            readOnly={!this.state.editable}
+            readOnly={!this.props.editable}
             value={this.state.episodeData.description}
             onChange={this.handleDescriptionChange.bind(this)}
           />
         </div>
 
-        {this.state.editable && (
+        {this.props.editable && (
           <div className="cancel-save grid-element">
             <select name="status"
               id="status-select"

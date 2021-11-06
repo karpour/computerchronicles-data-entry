@@ -3,6 +3,7 @@ import ComputerChroniclesEpisodeApiClient from "./ccapi/ComputerChroniclesEpisod
 import { ComputerChroniclesEpisodeMetadata } from "./ccapi/ComputerChroniclesEpisodeMetadata";
 import ComputerChroniclesEpisodeListComponent from "./components/ComputerChroniclesEpisodeListComponent";
 import ComputerChroniclesOriginalEpisodeComponent from "./components/ComputerChroniclesOriginalEpisodeComponent";
+import LoginComponent from "./components/LoginComponent";
 import isPositiveInteger from "./isPositiveInteger";
 
 
@@ -12,6 +13,8 @@ type ApiState = {
     editingEpisode: number | null;
     episodes: ComputerChroniclesEpisodeMetadata[];
     episodeIndex: ComputerChroniclesEpisodeIndex;
+    loggedIn: boolean;
+    userName: string | null;
 };
 
 type ComputerChroniclesEpisodeIndex = { [key: number]: ComputerChroniclesEpisodeMetadata | undefined; };
@@ -34,7 +37,9 @@ class App extends Component<ApiProps, ApiState> {
         this.state = {
             editingEpisode: null,
             episodeIndex: [],
-            episodes: []
+            episodes: [],
+            loggedIn: false,
+            userName: null,
         };
     }
 
@@ -44,6 +49,7 @@ class App extends Component<ApiProps, ApiState> {
             this.checkGetVars();
         }, false);
 
+        this.updateLoginStatus();
         this.reloadApiData().then(() => this.checkGetVars());
     }
 
@@ -62,13 +68,29 @@ class App extends Component<ApiProps, ApiState> {
             if (isPositiveInteger(epNum)) {
                 this.setEditedEpisode(epNum);
             }
-        }else{
+        } else {
             this.setState({ editingEpisode: null });
         }
     }
 
-    protected async reloadApiData() {
-        this.api.getAllEpisodes().then(episodes => {
+    public updateLoginStatus() {
+        return this.api.getLoginStatus().then(status => {
+            if (status.loggedIn) {
+                this.setState({
+                    loggedIn: true,
+                    userName: status.userName
+                });
+            } else {
+                this.setState({
+                    loggedIn: false,
+                    userName: null
+                });
+            }
+        });
+    }
+
+    protected reloadApiData() {
+        return this.api.getAllEpisodes().then(episodes => {
             this.setState({
                 episodes: episodes,
                 episodeIndex: convertEpisodesToIndexedArray(episodes)
@@ -95,20 +117,22 @@ class App extends Component<ApiProps, ApiState> {
     }
 
     public handleCancel() {
+        window.history.pushState(null, `Main Menu`, `/`);
         this.setState({ editingEpisode: null });
     }
 
     public render() {
         console.log(this.state);
+        let content!: JSX.Element | JSX.Element[];
         if (this.state.editingEpisode == null) {
-            return <div className="main">
+            content = [
                 <header className="episode-list-header">
                     <p>Welcome to the Computer Chronicles Archiving project!</p>
-                </header>
+                </header>,
                 <ComputerChroniclesEpisodeListComponent
                     episodeList={this.state.episodes}
                     onSelectEpisode={this.setEditedEpisode.bind(this)}
-                /></div>;
+                />];
         } else {
             const episodeData = this.state.episodeIndex[this.state.editingEpisode];
             if (episodeData) {
@@ -116,18 +140,29 @@ class App extends Component<ApiProps, ApiState> {
                     //return <ComputerChroniclesRerunEpisodeComponent
                     //    episodeData={episodeData}
                     //    onSaveEpisodeData={this.handleSaveEpisode.bind(this)} />;
-                    return <span>Re-run</span>;
+                    content = <span>Re-run</span>;
                 } else {
-                    return <ComputerChroniclesOriginalEpisodeComponent
+                    content = <ComputerChroniclesOriginalEpisodeComponent
                         episodeData={episodeData}
+                        editable={this.state.loggedIn}
                         onCancel={this.handleCancel.bind(this)}
                         onSaveEpisodeData={this.handleSaveEpisode.bind(this)} />;
                 }
             } else {
-                return <span>Not found :/</span>;
+                content = (<span>Not found :/</span>);
             }
         }
-
+        return (
+            <div className="main">
+                <LoginComponent
+                    loggedIn={this.state.loggedIn}
+                    userName={this.state.userName}
+                    showBackButton={this.state.editingEpisode ? true : false}
+                    onBack={this.handleCancel.bind(this)}
+                />
+                {content}
+            </div>
+        );
     }
 }
 

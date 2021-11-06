@@ -65,7 +65,8 @@ select {
 }
 
 .main {
-    width: 800px;
+    width: fit-content;
+    min-width: 800px;
     margin: auto;
     margin-top: 2em;
 }
@@ -89,7 +90,7 @@ select {
 .episode-list-item {
     background-color: var(--element-background);
     border-radius: 0.3em;
-    width: fit-content;
+    width: 100%;
     height: fit-content;
     margin-bottom: 0.5em;
     cursor: pointer;
@@ -152,11 +153,8 @@ select {
 }
 
 .grid-container {
-    max-width: 95%;
     margin-top: 1em;
     margin-bottom: 3em;
-    margin-left: auto;
-    margin-right: auto;
     display: grid;
     color: var(--element-title);
     grid-template-columns: auto auto auto;
@@ -335,4 +333,32 @@ iframe {
 .dates .date-container {
     flex-grow: 1;
     margin-right: 0.5em;
+}
+
+
+/* Login stuff */
+
+.login-header {
+    display: flex;
+    flex-direction: row;
+    justify-content: right;
+    margin-bottom: 1em;
+    color: var(--text-light);
+}
+
+.login-header form {
+    display: flex;
+    flex-direction: row;
+    justify-content: right;
+    flex-grow: 1;
+}
+
+.login-header span {
+    flex-grow: 1;
+    text-align: right;
+}
+
+.login-header input,
+.login-header form button {
+    margin-left: 0.5em;
 }

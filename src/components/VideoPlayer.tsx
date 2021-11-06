@@ -9,7 +9,7 @@ type VideoPlayerProps = {
     onIssuesUpdate: (issues: ComputerChroniclesEpisodeIssues) => void;
 };
 
-class VideoPlayer extends Component<VideoPlayerProps> {
+export default class VideoPlayer extends Component<VideoPlayerProps> {
 
     protected handleCheckBoxClick(e: ChangeEvent<HTMLInputElement>) {
         console.log(e);
@@ -44,5 +44,3 @@ class VideoPlayer extends Component<VideoPlayerProps> {
         </div>);
     }
 }
-
-export default VideoPlayer;

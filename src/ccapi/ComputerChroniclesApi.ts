@@ -37,4 +37,8 @@ export default class ComputerChroniclesApi {
     public static getFeaturedProducts() {
         return this.ccApiGet<ComputerChroniclesFeaturedProduct[]>('api/featuredproducts');
     }
+
+    public static getLoggedInStatus() {
+        return this.ccApiGet<ComputerChroniclesFeaturedProduct[]>('api/loginstatus');
+    }
 }

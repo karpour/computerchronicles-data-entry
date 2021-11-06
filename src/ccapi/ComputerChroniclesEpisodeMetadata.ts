@@ -44,7 +44,7 @@ export type ComputerChroniclesOriginalEpisodeMetadata = {
     airingDate: string,
     productionDate: string,
     description: string,
-    host?: ComputerChroniclesGuest,
+    host: ComputerChroniclesGuest | null,
     coHosts: ComputerChroniclesGuest[],
     guests: ComputerChroniclesGuest[],
     locations: ComputerChroniclesLocation[],
