@@ -15,6 +15,7 @@ type ApiState = {
     episodeIndex: ComputerChroniclesEpisodeIndex;
     loggedIn: boolean;
     userName: string | null;
+    tags: string[];
 };
 
 type ComputerChroniclesEpisodeIndex = { [key: number]: ComputerChroniclesEpisodeMetadata | undefined; };
@@ -40,6 +41,7 @@ class App extends Component<ApiProps, ApiState> {
             episodes: [],
             loggedIn: false,
             userName: null,
+            tags: []
         };
     }
 
@@ -89,19 +91,24 @@ class App extends Component<ApiProps, ApiState> {
         });
     }
 
-    protected reloadApiData() {
-        return this.api.getAllEpisodes().then(episodes => {
+    protected async reloadApiData() {
+        try {
+            const episodes = await this.api.getAllEpisodes();
+            const tags = await this.api.getTags();
             this.setState({
                 episodes: episodes,
-                episodeIndex: convertEpisodesToIndexedArray(episodes)
+                episodeIndex: convertEpisodesToIndexedArray(episodes),
+                tags: tags
             });
-        }).catch(err => console.log((err as Error).message));
+        } catch (err) {
+            console.log((err as Error).message);
+        }
     }
 
-    public handleSaveEpisode(episode: ComputerChroniclesEpisodeMetadata) {
+    public handleSaveEpisode(episode: ComputerChroniclesEpisodeMetadata): Promise<any> {
         console.log(`Saved Episode`);
         console.log(episode);
-        this.api.saveEpisode(episode).catch(err => console.log((err as any).message));
+        return this.api.saveEpisode(episode);
     }
 
     public setEditedEpisode(episodeNumber: number) {
@@ -146,7 +153,9 @@ class App extends Component<ApiProps, ApiState> {
                         episodeData={episodeData}
                         editable={this.state.loggedIn}
                         onCancel={this.handleCancel.bind(this)}
-                        onSaveEpisodeData={this.handleSaveEpisode.bind(this)} />;
+                        onSaveEpisodeData={this.handleSaveEpisode.bind(this)} 
+                        tags={this.state.tags}
+                        />;
                 }
             } else {
                 content = (<span>Not found :/</span>);

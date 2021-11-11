@@ -9,12 +9,14 @@ type ComputerChroniclesOriginalEpisodeComponentProps = {
   episodeData: ComputerChroniclesOriginalEpisodeMetadata;
   onCancel: () => void;
   editable: boolean;
-  onSaveEpisodeData: (newData: ComputerChroniclesOriginalEpisodeMetadata) => void;
+  onSaveEpisodeData: (newData: ComputerChroniclesOriginalEpisodeMetadata) => Promise<void>;
+  tags: string[];
 };
 
 type ComputerChroniclesOriginalEpisodeComponentState = {
   episodeData: ComputerChroniclesOriginalEpisodeMetadata;
   selectedStatus: ComputerChroniclesEpisodeStatus | "";
+  savedSuccess: boolean;
 };
 
 class ComputerChroniclesOriginalEpisodeComponent extends React.Component<ComputerChroniclesOriginalEpisodeComponentProps, ComputerChroniclesOriginalEpisodeComponentState> {
@@ -23,7 +25,8 @@ class ComputerChroniclesOriginalEpisodeComponent extends React.Component<Compute
     super(props);
     this.state = {
       episodeData: props.episodeData,
-      selectedStatus: ""
+      selectedStatus: "",
+      savedSuccess: false
     };
   }
 
@@ -124,7 +127,13 @@ class ComputerChroniclesOriginalEpisodeComponent extends React.Component<Compute
 
   protected handleSave() {
     if (this.state.selectedStatus !== "") {
-      this.props.onSaveEpisodeData(this.state.episodeData);
+      this.props.onSaveEpisodeData(this.state.episodeData)
+        .then(() => {
+          console.log("Setting savedSuccess to true");
+          this.setState({ savedSuccess: true });
+        }).catch(err => {
+          window.alert((err as Error).message);
+        });
     } else {
       window.alert("Select Episode Status first");
     }
@@ -190,7 +199,7 @@ class ComputerChroniclesOriginalEpisodeComponent extends React.Component<Compute
           <TagComponent
             name="episode-tags"
             editable={this.props.editable}
-            autoCompleteSuggestions={["Computer", "Chronicles"]}
+            autoCompleteSuggestions={this.props.tags}
             onTagChange={this.handleEpisodeTagChange.bind(this)}
             onAddTag={this.handleEpisodeTagAdd.bind(this)}
             className="episode-tags"
@@ -279,10 +288,9 @@ class ComputerChroniclesOriginalEpisodeComponent extends React.Component<Compute
               {statusOptions}
             </select>
             <button className="cancel-button" onClick={this.props.onCancel}>CANCEL</button>
-            <button className="save-button" onClick={this.handleSave.bind(this)}>SAVE</button>
+            <button className="save-button" onClick={this.handleSave.bind(this)}>{this.state.savedSuccess ? "SAVED ✔️" : "SAVE"}</button>
           </div>
         )}
-
 
         <div className="blank">
         </div>

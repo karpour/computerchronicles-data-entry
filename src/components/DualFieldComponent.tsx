@@ -67,9 +67,6 @@ class DualFieldComponent<ObjectType extends TwoStringValuesObject<ObjectType, Fi
     }
 
     public handleKeyPress(e: React.KeyboardEvent<HTMLInputElement>) {
-        console.log(e);
-        //console.log(this.state.newTag);
-
         if (e.key === "Enter") {
             e.preventDefault();
             let target = (e as any).target as HTMLInputElement;
@@ -89,9 +86,6 @@ class DualFieldComponent<ObjectType extends TwoStringValuesObject<ObjectType, Fi
     };
 
     public render() {
-
-
-
         const btnName = `${this.props.name}-add-button`;
 
         let fieldElements: JSX.Element[] = this.props.fields.map(

@@ -75,4 +75,8 @@ export default class ComputerChroniclesEpisodeApiClient {
     public getLoginStatus(): Promise<LoginStatus> {
         return this.ccApiGet(`${this.apiUrl}/loginstatus`);
     }
+
+    public getTags(): Promise<string[]> {
+        return this.ccApiGet(`${this.apiUrl}/tags`);
+    }
 }
