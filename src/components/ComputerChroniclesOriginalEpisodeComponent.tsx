@@ -17,6 +17,7 @@ type ComputerChroniclesOriginalEpisodeComponentState = {
   episodeData: ComputerChroniclesOriginalEpisodeMetadata;
   selectedStatus: ComputerChroniclesEpisodeStatus | "";
   savedSuccess: boolean;
+  randomAccessText: string;
 };
 
 class ComputerChroniclesOriginalEpisodeComponent extends React.Component<ComputerChroniclesOriginalEpisodeComponentProps, ComputerChroniclesOriginalEpisodeComponentState> {
@@ -26,7 +27,8 @@ class ComputerChroniclesOriginalEpisodeComponent extends React.Component<Compute
     this.state = {
       episodeData: props.episodeData,
       selectedStatus: "",
-      savedSuccess: false
+      savedSuccess: false,
+      randomAccessText: props.episodeData.randomAccess ? props.episodeData.randomAccess.join('\n') : ""
     };
   }
 
@@ -93,7 +95,18 @@ class ComputerChroniclesOriginalEpisodeComponent extends React.Component<Compute
     if (newHostList) {
       this.setEpisodeState({ host: newHostList[0] });
     } else {
-      this.setEpisodeState({ host: undefined });
+      this.setEpisodeState({ host: null });
+    }
+  }
+
+  private handleRandomAccessHostFieldChanged(index: number, newField: ComputerChroniclesGuest | null) {
+    let oldHostList = this.state.episodeData.randomAccessHost ? [this.state.episodeData.randomAccessHost] : [];
+    let newHostList = this.updateFieldList(oldHostList, index, newField);
+
+    if (newHostList) {
+      this.setEpisodeState({ randomAccessHost: newHostList[0] });
+    } else {
+      this.setEpisodeState({ randomAccessHost: null });
     }
   }
 
@@ -105,6 +118,18 @@ class ComputerChroniclesOriginalEpisodeComponent extends React.Component<Compute
   protected handleDescriptionChange(e: ChangeEvent<HTMLTextAreaElement>) {
     this.setEpisodeState({
       description: e.target.value
+    });
+  }
+
+  protected handleNotesChange(e: ChangeEvent<HTMLTextAreaElement>) {
+    this.setEpisodeState({
+      notes: e.target.value
+    });
+  }
+
+  protected handleRandomAccessChange(e: ChangeEvent<HTMLTextAreaElement>) {
+    this.setState({
+      randomAccessText: e.target.value
     });
   }
 
@@ -126,14 +151,20 @@ class ComputerChroniclesOriginalEpisodeComponent extends React.Component<Compute
   }
 
   protected handleSave() {
+    const randomAccess = this.state.randomAccessText ? this.state.randomAccessText.split('\n').map(item => item.trim()).filter(item => item != "") : null;
+    this.setEpisodeState({
+      randomAccess: randomAccess
+    });
     if (this.state.selectedStatus !== "") {
-      this.props.onSaveEpisodeData(this.state.episodeData)
-        .then(() => {
-          console.log("Setting savedSuccess to true");
-          this.setState({ savedSuccess: true });
-        }).catch(err => {
-          window.alert((err as Error).message);
-        });
+      this.props.onSaveEpisodeData({
+        ...this.state.episodeData,
+        randomAccess: randomAccess
+      }).then(() => {
+        console.log("Setting savedSuccess to true");
+        this.setState({ savedSuccess: true });
+      }).catch(err => {
+        window.alert((err as Error).message);
+      });
     } else {
       window.alert("Select Episode Status first");
     }
@@ -180,7 +211,7 @@ class ComputerChroniclesOriginalEpisodeComponent extends React.Component<Compute
 
           <div className="spacer"></div>
 
-          <h2>Guests</h2>
+          <h2>Guests &amp; People in the episode</h2>
           <DualFieldComponent<ComputerChroniclesGuest, "name", "role">
             name="cc-guests"
             title1="Name"
@@ -190,6 +221,21 @@ class ComputerChroniclesOriginalEpisodeComponent extends React.Component<Compute
             fields={this.state.episodeData.guests}
             canAddOrRemoveFields={this.props.editable}
             onFieldChanged={this.handleGuestFieldChanged.bind(this)}
+          />
+
+          <div className="spacer"></div>
+
+          <h2>Random Access Segment Host (if applicable)</h2>
+          <DualFieldComponent<ComputerChroniclesGuest, "name", "role">
+            name="cc-randomaccesshost"
+            title1="Name"
+            title2="Company/Role"
+            fieldName1="name"
+            fieldName2="role"
+            maxItems={1}
+            fields={this.state.episodeData.randomAccessHost ? [this.state.episodeData.randomAccessHost] : []}
+            canAddOrRemoveFields={this.props.editable}
+            onFieldChanged={this.handleRandomAccessHostFieldChanged.bind(this)}
           />
         </div>
 
@@ -211,7 +257,6 @@ class ComputerChroniclesOriginalEpisodeComponent extends React.Component<Compute
         <VideoPlayer
           videoId={this.state.episodeData.iaIdentifier ?? null}
           issues={this.state.episodeData.issues ?? {}}
-          iaIdentifier={this.state.episodeData.iaIdentifier ?? "<missing video>"}
           onIssuesUpdate={this.handleIssuesUpdate.bind(this)}
           editable={this.props.editable}
         />
@@ -266,6 +311,16 @@ class ComputerChroniclesOriginalEpisodeComponent extends React.Component<Compute
             canAddOrRemoveFields={this.props.editable}
             onFieldChanged={this.handleLocationChanged.bind(this)}
           />
+
+          <div className="spacer"></div>
+          <h2>Notes / ToDo</h2>
+          <textarea
+            className="notes"
+            readOnly={!this.props.editable}
+            value={this.state.episodeData.notes ?? ""}
+            onChange={this.handleNotesChange.bind(this)}
+            placeholder="Internal notes, such as 'metadata complete until at 9:55' and things that still need to be changed"
+          />
         </div>
 
         <div className="description grid-element">
@@ -274,6 +329,12 @@ class ComputerChroniclesOriginalEpisodeComponent extends React.Component<Compute
             readOnly={!this.props.editable}
             value={this.state.episodeData.description}
             onChange={this.handleDescriptionChange.bind(this)}
+          />
+          <h2>Random Access bullet points (one per line)</h2>
+          <textarea
+            readOnly={!this.props.editable}
+            value={this.state.randomAccessText}
+            onChange={this.handleRandomAccessChange.bind(this)}
           />
         </div>
 

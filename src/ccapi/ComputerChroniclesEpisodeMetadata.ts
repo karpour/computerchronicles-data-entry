@@ -51,6 +51,10 @@ export type ComputerChroniclesOriginalEpisodeMetadata = {
     featuredProducts: ComputerChroniclesFeaturedProduct[],
     tags: string[],
     status: ComputerChroniclesEpisodeStatus;
+    randomAccess: string[] | null;
+    randomAccessHost: ComputerChroniclesGuest | null,
+    editedBy?: string;
+    notes?: string;
 };
 
 export type ComputerChroniclesRerunEpisodeMetadata = {
@@ -61,7 +65,12 @@ export type ComputerChroniclesRerunEpisodeMetadata = {
     reRunOf: number | null,
     airingDate: string,
     status: ComputerChroniclesEpisodeStatus;
+    randomAccess: string[] | null;
+    randomAccessHost: ComputerChroniclesGuest | null,
+    editedBy?: string;
+    notes?: string;
 };
+
 
 export type ComputerChroniclesEpisodeInfo = {
     episodeNumber: number,

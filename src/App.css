@@ -66,9 +66,24 @@ select {
 
 .main {
     width: fit-content;
-    min-width: 800px;
+    max-width: 800px;
     margin: auto;
     margin-top: 2em;
+}
+
+.main-editing {
+    width: 90vw;
+    max-width: 1900px;
+    margin: auto;
+    margin-top: 1em;
+}
+
+@media (max-width: 1600px) {
+    .main-editing {
+        width: 100%;
+        margin: auto;
+        margin-top: 2em;
+    }
 }
 
 .season-separator {
@@ -79,7 +94,7 @@ select {
     color: white;
     background-color: var(--element-background);
     border-radius: 0.3em;
-    padding: 1em;
+    padding: 0.1em 1em;
     margin-bottom: 1em;
 }
 
@@ -94,6 +109,8 @@ select {
     height: fit-content;
     margin-bottom: 0.5em;
     cursor: pointer;
+    display: flex;
+    align-items: center;
 }
 
 .episode-list-item:hover {
@@ -112,7 +129,7 @@ select {
 
 .episode-list-title {
     display: inline-block;
-    width: 70%;
+    flex-grow: 1;
 }
 
 .episode-status {
@@ -157,7 +174,7 @@ select {
     margin-bottom: 3em;
     display: grid;
     color: var(--element-title);
-    grid-template-columns: auto auto auto;
+    grid-template-columns: minmax(auto, 20vw) auto minmax(auto, 20vw);
     grid-template-rows: auto auto auto auto auto;
     gap: 0.5em 0.5em;
     grid-template-areas: "header header dates" "hosts video tags" "hosts video products" "description description products" "blank blank footer";
@@ -240,15 +257,24 @@ select {
     grid-area: video;
 }
 
-.video iframe {
+
+/*.video iframe {
     display: block;
     width: 800px;
     min-height: 600px;
     height: auto;
-}
+}*/
 
 .products {
     grid-area: products;
+    min-width: 18em;
+    display: flex;
+    flex-direction: column;
+}
+
+.notes {
+    flex-grow: 1;
+    min-height: 5em;
 }
 
 .description {
@@ -293,6 +319,7 @@ iframe {
     margin: 0;
     padding: 0;
     display: inline;
+    font-size: small;
 }
 
 .episode-tags ul li {
@@ -317,6 +344,7 @@ iframe {
     margin: 2px;
     display: inline-block;
     cursor: pointer;
+    font-size: smaller;
 }
 
 .episode-tags .tag-text-input {
@@ -333,6 +361,21 @@ iframe {
 .dates .date-container {
     flex-grow: 1;
     margin-right: 0.5em;
+}
+
+.media-container {
+    position: relative;
+    padding-bottom: 76%;
+}
+
+.media-container iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100%;
+    height: 100%;
 }
 
 

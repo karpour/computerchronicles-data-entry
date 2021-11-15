@@ -59,10 +59,10 @@ class TagComponent extends Component<TagComponentProps, TagComponentState> {
 
     protected handleValueChange(e: ChangeEvent<HTMLInputElement>) {
         const t = e.target.value;
-        if (t !== this.lastAddedTag) {
-            console.log(`Value changed: ${t}`);
+        //if (t !== this.lastAddedTag) {
+            //console.log(`Value changed: ${t}`);
             this.setState({ newTag: t });
-        }
+        //}
     };
 
     protected handleInput(e: FormEvent<HTMLInputElement>) {
@@ -105,7 +105,7 @@ class TagComponent extends Component<TagComponentProps, TagComponentState> {
                     name={`${this.props.name}-tag-input`}
                     onChange={this.handleValueChange.bind(this)}
                     onKeyPress={this.handleKeyPress.bind(this)}
-                    onInput={this.handleInput.bind(this)}
+                    //onInput={this.handleInput.bind(this)}
                     placeholder="Enter tag"
                 />)}
 

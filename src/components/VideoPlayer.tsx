@@ -5,7 +5,6 @@ type VideoPlayerProps = {
     videoId: string | null;
     issues: ComputerChroniclesEpisodeIssues;
     editable: boolean;
-    iaIdentifier: string;
     onIssuesUpdate: (issues: ComputerChroniclesEpisodeIssues) => void;
 };
 
@@ -26,7 +25,10 @@ export default class VideoPlayer extends Component<VideoPlayerProps> {
 
     public render(): JSX.Element {
         return (<div className="video grid-element">
-            <iframe title="video" src={"https://archive.org/embed/" + this.props.videoId}></iframe>
+            <div className="media-container">
+                {this.props.videoId && <iframe title="video" src={"https://archive.org/embed/" + this.props.videoId}></iframe>}
+                {!this.props.videoId && <span>MISSING VIDEO</span>}
+            </div>
 
             <div className="video-checkbox">
                 <input type="checkbox" id="videoIssues" name="videoIssues" onChange={this.handleCheckBoxClick.bind(this)} checked={this.props.issues.videoIssues} disabled={!this.props.editable}></input>
@@ -40,7 +42,7 @@ export default class VideoPlayer extends Component<VideoPlayerProps> {
                 <input type="checkbox" id="noAudio" name="noAudio" onChange={this.handleCheckBoxClick.bind(this)} checked={this.props.issues.noAudio} disabled={!this.props.editable}></input>
                 <label htmlFor="noAudio">No Audio</label>
             </div>
-            <div className="ia-identifier"><b>{this.props.iaIdentifier}</b></div>
+            {this.props.videoId && <div className="ia-identifier"><b><a href={`https://archive.org/details/${this.props.videoId}`} target="_blank">{this.props.videoId}</a></b></div>}
         </div>);
     }
 }

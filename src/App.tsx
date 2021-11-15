@@ -92,6 +92,7 @@ class App extends Component<ApiProps, ApiState> {
     }
 
     protected async reloadApiData() {
+        console.log("Reloading api data");
         try {
             const episodes = await this.api.getAllEpisodes();
             const tags = await this.api.getTags();
@@ -129,12 +130,15 @@ class App extends Component<ApiProps, ApiState> {
     }
 
     public render() {
-        console.log(this.state);
+        //console.log(this.state);
         let content!: JSX.Element | JSX.Element[];
         if (this.state.editingEpisode == null) {
             content = [
                 <header className="episode-list-header">
-                    <p>Welcome to the Computer Chronicles Archiving project!</p>
+                    <p>Welcome to the Computer Chronicles Archiving project!<br />
+                        This project aims to once and for all complete all metadata for the Computer Chronicles.</p>
+                    <p><b>Want to participate?</b> Join the <a href="https://discord.gg/BMuUSEQNAA">discord server</a> or write an <a href="mailto:computerchronicles@thomasnovotny.com">e-mail</a>.</p>
+                    <p>The entire dataset is available here: <a href="computerchronicles_metadata.json">JSON</a> <a href="computerchronicles_metadata.ndjson">NDJSON</a></p>
                 </header>,
                 <ComputerChroniclesEpisodeListComponent
                     episodeList={this.state.episodes}
@@ -153,16 +157,16 @@ class App extends Component<ApiProps, ApiState> {
                         episodeData={episodeData}
                         editable={this.state.loggedIn}
                         onCancel={this.handleCancel.bind(this)}
-                        onSaveEpisodeData={this.handleSaveEpisode.bind(this)} 
+                        onSaveEpisodeData={this.handleSaveEpisode.bind(this)}
                         tags={this.state.tags}
-                        />;
+                    />;
                 }
             } else {
                 content = (<span>Not found :/</span>);
             }
         }
         return (
-            <div className="main">
+            <div className={this.state.editingEpisode ? "main-editing" : "main"}>
                 <LoginComponent
                     loggedIn={this.state.loggedIn}
                     userName={this.state.userName}
