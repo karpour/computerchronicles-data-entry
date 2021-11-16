@@ -1,6 +1,7 @@
 import { Component } from "react";
 import ComputerChroniclesEpisodeApiClient from "./ccapi/ComputerChroniclesEpisodeApiClient";
 import { ComputerChroniclesEpisodeMetadata } from "./ccapi/ComputerChroniclesEpisodeMetadata";
+import ComputerChroniclesEpisodeDateComponent from "./components/ComputerChroniclesEpisodeDateComponent";
 import ComputerChroniclesEpisodeListComponent from "./components/ComputerChroniclesEpisodeListComponent";
 import ComputerChroniclesOriginalEpisodeComponent from "./components/ComputerChroniclesOriginalEpisodeComponent";
 import LoginComponent from "./components/LoginComponent";
@@ -9,6 +10,12 @@ import isPositiveInteger from "./isPositiveInteger";
 
 type ApiProps = {};
 
+enum Page {
+    MAIN,
+    EDITING,
+    DATE_LIST
+}
+
 type ApiState = {
     editingEpisode: number | null;
     episodes: ComputerChroniclesEpisodeMetadata[];
@@ -16,6 +23,8 @@ type ApiState = {
     loggedIn: boolean;
     userName: string | null;
     tags: string[];
+    showReRuns: boolean;
+    page: Page,
 };
 
 type ComputerChroniclesEpisodeIndex = { [key: number]: ComputerChroniclesEpisodeMetadata | undefined; };
@@ -41,7 +50,9 @@ class App extends Component<ApiProps, ApiState> {
             episodes: [],
             loggedIn: false,
             userName: null,
-            tags: []
+            tags: [],
+            showReRuns: false,
+            page: Page.MAIN
         };
     }
 
@@ -70,8 +81,10 @@ class App extends Component<ApiProps, ApiState> {
             if (isPositiveInteger(epNum)) {
                 this.setEditedEpisode(epNum);
             }
+        } else if ($_GET.dates) {
+            this.setState({ editingEpisode: null, page: Page.DATE_LIST });
         } else {
-            this.setState({ editingEpisode: null });
+            this.setState({ editingEpisode: null, page: Page.MAIN });
         }
     }
 
@@ -117,7 +130,7 @@ class App extends Component<ApiProps, ApiState> {
         let episode = this.state.episodeIndex[episodeNumber];
         if (episode) {
             window.history.pushState(episodeNumber, `CC${episodeNumber} - ${episode.isReRun ? "ReRun" : episode.title}`, `/?ep=${episodeNumber}`);
-            this.setState({ editingEpisode: episodeNumber });
+            this.setState({ editingEpisode: episodeNumber, page: Page.EDITING });
         } else {
             console.error(`Episode ${episodeNumber} not found`);
             console.log(episode);
@@ -126,56 +139,77 @@ class App extends Component<ApiProps, ApiState> {
 
     public handleCancel() {
         window.history.pushState(null, `Main Menu`, `/`);
-        this.setState({ editingEpisode: null });
+        this.setState({ editingEpisode: null, page: Page.MAIN });
     }
 
     public render() {
         //console.log(this.state);
         let content!: JSX.Element | JSX.Element[];
-        if (this.state.editingEpisode == null) {
-            content = [
-                <header className="episode-list-header">
-                    <p>Welcome to the Computer Chronicles Archiving project!<br />
-                        This project aims to once and for all complete all metadata for the Computer Chronicles.</p>
-                    <p><b>Want to participate?</b> Join the <a href="https://discord.gg/BMuUSEQNAA">discord server</a> or write an <a href="mailto:computerchronicles@thomasnovotny.com">e-mail</a>.</p>
-                    <p>The entire dataset is available here: <a href="computerchronicles_metadata.json">JSON</a> <a href="computerchronicles_metadata.ndjson">NDJSON</a></p>
-                </header>,
-                <ComputerChroniclesEpisodeListComponent
-                    episodeList={this.state.episodes}
-                    onSelectEpisode={this.setEditedEpisode.bind(this)}
-                />];
-        } else {
-            const episodeData = this.state.episodeIndex[this.state.editingEpisode];
-            if (episodeData) {
-                if (episodeData.isReRun) {
-                    //return <ComputerChroniclesRerunEpisodeComponent
-                    //    episodeData={episodeData}
-                    //    onSaveEpisodeData={this.handleSaveEpisode.bind(this)} />;
-                    content = <span>Re-run</span>;
+
+        const loginComponent = <LoginComponent
+            loggedIn={this.state.loggedIn}
+            userName={this.state.userName}
+            showBackButton={this.state.editingEpisode ? true : false}
+            onBack={this.handleCancel.bind(this)}
+        />;
+
+        switch (this.state.page) {
+            case Page.MAIN:
+                return <div className="main">
+                    {loginComponent}
+                    <header className="episode-list-header">
+                        <p>Welcome to the Computer Chronicles Archiving project!<br />
+                            This project aims to once and for all complete all metadata for the Computer Chronicles.</p>
+                        <p><b>Want to participate?</b> Join the <a href="https://discord.gg/BMuUSEQNAA">discord server</a> or write an <a href="mailto:computerchronicles@thomasnovotny.com">e-mail</a>.</p>
+                        <p>The entire dataset is available here: <a href="computerchronicles_metadata.json">JSON</a> <a href="computerchronicles_metadata.ndjson">NDJSON</a></p>
+                    </header>
+                    <div className="episode-list-item">
+                        <input type="checkbox" name="show-reruns" id="show-reruns" checked={this.state.showReRuns} onChange={() => { this.setState({ showReRuns: !this.state.showReRuns }); }}></input>
+                        <label htmlFor="show-reruns">Show Re-Runs</label>
+                    </div>
+                    <ComputerChroniclesEpisodeListComponent
+                        episodeList={this.state.showReRuns ? this.state.episodes : this.state.episodes.filter(ep => !ep.isReRun)}
+                        onSelectEpisode={this.setEditedEpisode.bind(this)}
+                    />
+                </div>;
+
+            case Page.EDITING:
+                const episodeData = this.state.episodeIndex[this.state.editingEpisode ?? 101];
+                if (episodeData) {
+                    if (episodeData.isReRun) {
+                        return <div className="main-editing">
+                            {loginComponent}
+                            <span>Re-run</span>;
+                        </div>;
+
+                    } else {
+                        return <div className="main-editing">
+                            {loginComponent}
+                            <ComputerChroniclesOriginalEpisodeComponent
+                                episodeData={episodeData}
+                                editable={this.state.loggedIn}
+                                onCancel={this.handleCancel.bind(this)}
+                                onSaveEpisodeData={this.handleSaveEpisode.bind(this)}
+                                tags={this.state.tags}
+                            />
+                        </div>;
+                    }
                 } else {
-                    content = <ComputerChroniclesOriginalEpisodeComponent
-                        episodeData={episodeData}
-                        editable={this.state.loggedIn}
-                        onCancel={this.handleCancel.bind(this)}
-                        onSaveEpisodeData={this.handleSaveEpisode.bind(this)}
-                        tags={this.state.tags}
-                    />;
+                    return <span>Not found</span>;
                 }
-            } else {
-                content = (<span>Not found :/</span>);
-            }
+
+            case Page.DATE_LIST:
+                return <div className="main">
+                    {loginComponent}
+                    <header className="episode-list-header">
+                        <p>This page shows all episodes and their respective dates.</p>
+                    </header>
+                    <ComputerChroniclesEpisodeDateComponent
+                        episodeList={this.state.episodes}
+                        onSelectEpisode={this.setEditedEpisode.bind(this)}
+                    />
+                </div>;
         }
-        return (
-            <div className={this.state.editingEpisode ? "main-editing" : "main"}>
-                <LoginComponent
-                    loggedIn={this.state.loggedIn}
-                    userName={this.state.userName}
-                    showBackButton={this.state.editingEpisode ? true : false}
-                    onBack={this.handleCancel.bind(this)}
-                />
-                {content}
-            </div>
-        );
     }
 }
 

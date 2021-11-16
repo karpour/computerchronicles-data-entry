@@ -19,6 +19,10 @@
     --episode-status-done: rgb(13, 102, 7);
 }
 
+body {
+    color: var(--text-light);
+}
+
 a {
     color: white;
 }
@@ -113,6 +117,11 @@ select {
     align-items: center;
 }
 
+.episode-list-missing::after {
+    content: '[missing]';
+    color: red;
+}
+
 .episode-list-item:hover {
     background-color: var(--element-background-lighter);
 }
@@ -125,6 +134,40 @@ select {
     margin-right: 0.5em;
     width: 4em;
     display: inline-block;
+}
+
+.episode-list-date {
+    padding: 0.3em 0.1em;
+    text-align: center;
+    margin-left: 0.5em;
+    margin-right: 0.5em;
+    width: 6em;
+    font-weight: bold;
+    display: inline-block;
+}
+
+.date-unsure {
+    color: grey;
+}
+
+.date-unsure::after {
+    content: '?';
+}
+
+.days-0-or-fewer {
+    color: red
+}
+
+.days-7 {
+    color: green
+}
+
+.days-other {
+    color: orange;
+}
+
+.days-gap {
+    margin: 0.5em 2em;
 }
 
 .episode-list-title {
