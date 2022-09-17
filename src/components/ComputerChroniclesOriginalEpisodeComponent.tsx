@@ -74,7 +74,6 @@ class ComputerChroniclesOriginalEpisodeComponent extends React.Component<Compute
     this.setEpisodeState({ guests: this.updateFieldList(this.state.episodeData.guests, index, newField) });
   }
 
-
   private handleCoHostFieldChanged(index: number, newField: ComputerChroniclesGuest | null) {
     this.setEpisodeState({ coHosts: this.updateFieldList(this.state.episodeData.coHosts, index, newField) });
 

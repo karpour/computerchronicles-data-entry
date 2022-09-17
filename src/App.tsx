@@ -160,7 +160,7 @@ class App extends Component<ApiProps, ApiState> {
                     <header className="episode-list-header">
                         <p>Welcome to the Computer Chronicles Archiving project!<br />
                             This project aims to once and for all complete all metadata for the Computer Chronicles.</p>
-                        <p><b>Want to participate?</b> Join the <a href="https://discord.gg/BMuUSEQNAA">discord server</a> or write an <a href="mailto:computerchronicles@thomasnovotny.com">e-mail</a>.</p>
+                        <p><b>Want to participate?</b> Join the <a href="https://discord.gg/STPwnYqcnW">discord server</a> or write an <a href="mailto:computerchronicles@thomasnovotny.com">e-mail</a>.</p>
                         <p>The entire dataset is available here: <a href="computerchronicles_metadata.json">JSON</a> <a href="computerchronicles_metadata.ndjson">NDJSON</a></p>
                     </header>
                     <div className="episode-list-item">
