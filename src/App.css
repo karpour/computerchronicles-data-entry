@@ -14,6 +14,7 @@
     --rerun-episode-number: rgb(84, 90, 83);
     --rerun-unknown-episode-number: rgb(80, 50, 50);
     --episode-status-unknown: rgb(53, 51, 51);
+    --episode-status-videochecked: rgb(63, 60, 60);
     --episode-status-needswork: rgb(150, 97, 0);
     --episode-status-review: rgb(109, 177, 20);
     --episode-status-done: rgb(13, 102, 7);
@@ -33,6 +34,12 @@ select {
     background: var(--input-background);
     border: 1px solid var(--input-border);
     color: var(--input-text-color);
+}
+
+.header input {
+    font-size: 1em;
+    flex-grow: 1;
+    margin-left: 0.5em;
 }
 
 .select-status {
@@ -117,9 +124,33 @@ select {
     align-items: center;
 }
 
+.episode-list-title {
+    display: inline-block;
+    flex-grow: 1;
+}
+
 .episode-list-missing::after {
-    content: '[missing]';
+    content: "[MISSING VIDEO]";
+    font-weight: bold;
+    font-size: 0.5em;
+    margin-left: 1em;
     color: red;
+}
+
+.episode-original-only::after {
+    content: "[ONLY ORIGINAL AVAILABLE]";
+    font-weight: bold;
+    font-size: 0.5em;
+    margin-left: 1em;
+    color: yellow;
+}
+
+.episode-rerun-only::after {
+    content: "[ONLY RERUN AVAILABLE]";
+    font-weight: bold;
+    font-size: 0.5em;
+    margin-left: 1em;
+    color: yellow;
 }
 
 .episode-list-item:hover {
@@ -170,11 +201,6 @@ select {
     margin: 0.5em 2em;
 }
 
-.episode-list-title {
-    display: inline-block;
-    flex-grow: 1;
-}
-
 .episode-status {
     padding: 0.3em 0.1em;
     text-align: center;
@@ -186,6 +212,10 @@ select {
 
 .episode-status-unknown {
     background-color: var(--episode-status-unknown);
+}
+
+.episode-status-videochecked {
+    background-color: var(--episode-status-videochecked);
 }
 
 .episode-status-done {
@@ -220,7 +250,7 @@ select {
     grid-template-columns: minmax(auto, 20vw) auto minmax(auto, 20vw);
     grid-template-rows: auto auto auto auto auto;
     gap: 0.5em 0.5em;
-    grid-template-areas: "header header dates" "hosts video tags" "hosts video products" "description description products" "blank blank footer";
+    grid-template-areas: "header header dates""hosts video tags""hosts video products""description description products""blank blank footer";
 }
 
 .blank {
@@ -278,6 +308,7 @@ select {
     padding: 0.1em;
     margin: 0;
     font-size: 3em;
+    display: flex;
 }
 
 .hosts {
@@ -342,7 +373,8 @@ iframe {
     margin-right: 2em;
 }
 
-.ia-identifier {
+.ia-identifier,
+.ia-identifier-editor {
     margin: 0.5em;
     float: right;
 }

@@ -31,15 +31,15 @@ export type ComputerChroniclesEpisodeIssues = {
     noAudio?: boolean,
 };
 
-export const COMPUTERCHRONICLES_EPISODE_STATUSES = ["unknown", "needswork", "review", "done"] as const;
+export const COMPUTERCHRONICLES_EPISODE_STATUSES = ["unknown", "videochecked", "needswork", "review", "done"] as const;
 
 export type ComputerChroniclesEpisodeStatus = typeof COMPUTERCHRONICLES_EPISODE_STATUSES[number];
 
 export type ComputerChroniclesOriginalEpisodeMetadata = {
-    iaIdentifier?: string,
+    iaIdentifier: string | null,
     issues?: ComputerChroniclesEpisodeIssues;
     title: string,
-    episodeNumber: number,
+    episodeNumber: ComputerChroniclesEpisodeNumber,
     isReRun: false,
     airingDate: string,
     productionDate: string,
@@ -59,10 +59,11 @@ export type ComputerChroniclesOriginalEpisodeMetadata = {
 
 export type ComputerChroniclesRerunEpisodeMetadata = {
     issues?: ComputerChroniclesEpisodeIssues;
-    iaIdentifier?: string,
-    episodeNumber: number,
+    iaIdentifier: string | null,
+    episodeNumber: ComputerChroniclesEpisodeNumber,
     isReRun: true,
-    reRunOf: number | null,
+    reRunOf: ComputerChroniclesEpisodeNumber | null,
+    productionDate: string,
     airingDate: string,
     status: ComputerChroniclesEpisodeStatus;
     randomAccess: string[] | null;
@@ -73,7 +74,7 @@ export type ComputerChroniclesRerunEpisodeMetadata = {
 
 
 export type ComputerChroniclesEpisodeInfo = {
-    episodeNumber: number,
+    episodeNumber: ComputerChroniclesEpisodeNumber,
     title: string,
 } & ({
     isReRun: false,
@@ -83,3 +84,11 @@ export type ComputerChroniclesEpisodeInfo = {
 });
 
 export type ComputerChroniclesEpisodeMetadata = ComputerChroniclesOriginalEpisodeMetadata | ComputerChroniclesRerunEpisodeMetadata;
+
+export type ComputerChroniclesEpisodeNumber = number;
+
+export type ComputerChroniclesEpisodeIndex = { [key: number]: ComputerChroniclesEpisodeMetadata | undefined; };
+
+export function parseComputerChroniclesEpisodeNumber(epNum: string): ComputerChroniclesEpisodeNumber {
+    return parseInt(epNum);
+}

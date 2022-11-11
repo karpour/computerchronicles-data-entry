@@ -3,10 +3,21 @@ import VideoPlayer from './VideoPlayer';
 import React, { ChangeEvent } from 'react';
 import TagComponent from './TagComponent';
 import DualFieldComponent from './DualFieldComponent';
-import { ComputerChroniclesEpisodeIssues, ComputerChroniclesEpisodeStatus, ComputerChroniclesFeaturedProduct, ComputerChroniclesGuest, ComputerChroniclesLocation, ComputerChroniclesOriginalEpisodeMetadata, COMPUTERCHRONICLES_EPISODE_STATUSES } from '../ccapi/ComputerChroniclesEpisodeMetadata';
+import {
+  ComputerChroniclesEpisodeIssues,
+  ComputerChroniclesEpisodeStatus,
+  ComputerChroniclesFeaturedProduct,
+  ComputerChroniclesGuest,
+  ComputerChroniclesLocation,
+  ComputerChroniclesOriginalEpisodeMetadata,
+  ComputerChroniclesRerunEpisodeMetadata,
+  COMPUTERCHRONICLES_EPISODE_STATUSES
+} from '../ccapi/ComputerChroniclesEpisodeMetadata';
 
 type ComputerChroniclesOriginalEpisodeComponentProps = {
   episodeData: ComputerChroniclesOriginalEpisodeMetadata;
+  episodeReRuns: ComputerChroniclesRerunEpisodeMetadata[];
+  onChangeReRun: (sourceEpisode: ComputerChroniclesOriginalEpisodeMetadata, reRunEpisode: ComputerChroniclesRerunEpisodeMetadata) => Promise<boolean>,
   onCancel: () => void;
   editable: boolean;
   onSaveEpisodeData: (newData: ComputerChroniclesOriginalEpisodeMetadata) => Promise<void>;
@@ -30,6 +41,14 @@ class ComputerChroniclesOriginalEpisodeComponent extends React.Component<Compute
       savedSuccess: false,
       randomAccessText: props.episodeData.randomAccess ? props.episodeData.randomAccess.join('\n') : ""
     };
+  }
+
+  private getReRunVideoEp(): ComputerChroniclesRerunEpisodeMetadata | null {
+    return this.props.episodeReRuns.find(ep => ep.iaIdentifier) ?? null;
+  }
+
+  private getReRunIaIdentifier(): string | null {
+    return this.getReRunVideoEp()?.iaIdentifier ?? null;
   }
 
   private setEpisodeState(newState: Partial<ComputerChroniclesOriginalEpisodeMetadata>) {
@@ -144,13 +163,32 @@ class ComputerChroniclesOriginalEpisodeComponent extends React.Component<Compute
     });
   }
 
+  protected handleEpisodeTitleChange(e: ChangeEvent<HTMLInputElement>) {
+    this.setEpisodeState({
+      title: e.target.value
+    });
+  }
+
+  protected handleReRunChange(e: React.MouseEvent<HTMLButtonElement>) {
+    e.preventDefault();
+    const button: HTMLButtonElement = e.currentTarget;
+    button.getAttribute("data-rerunepisode");
+  }
+
+  protected handleIaIdentifierUpdate(identifier: string | null) {
+    console.log(`Updated IA Identifier to ${identifier}`);
+    this.setEpisodeState({
+      iaIdentifier: identifier ? identifier : null
+    });
+  }
+
   protected handleEpisodeStatusChange(e: ChangeEvent<HTMLSelectElement>) {
     this.setEpisodeState({ status: e.target.value as any });
     this.setState({ selectedStatus: e.target.value as any });
   }
 
   protected handleSave() {
-    const randomAccess = this.state.randomAccessText ? this.state.randomAccessText.split('\n').map(item => item.trim()).filter(item => item != "") : null;
+    const randomAccess = this.state.randomAccessText ? this.state.randomAccessText.split('\n').map(item => item.trim()).filter(item => item !== "") : null;
     this.setEpisodeState({
       randomAccess: randomAccess
     });
@@ -174,10 +212,29 @@ class ComputerChroniclesOriginalEpisodeComponent extends React.Component<Compute
       s => <option value={s}>{s}</option>
     );
 
+    let videoEpisode: ComputerChroniclesOriginalEpisodeMetadata | ComputerChroniclesRerunEpisodeMetadata = this.state.episodeData;
+    let videoFromEpisode: number | null = null;
+    if (!videoEpisode.iaIdentifier) {
+      for (let ep of this.props.episodeReRuns) {
+        if (ep.iaIdentifier) {
+          videoEpisode = ep;
+          videoFromEpisode = ep.episodeNumber;
+        }
+      }
+    }
+
     return (
       <div className="grid-container">
         <div className="header grid-element">
-          <h1>CC{this.state.episodeData.episodeNumber} - {this.state.episodeData.title}</h1>
+          {
+            this.props.editable ? (<h1>CC{this.state.episodeData.episodeNumber} - <input type="text"
+              id="cc-episode-title"
+              value={this.state.episodeData.title}
+              onChange={this.handleEpisodeTitleChange.bind(this)}
+            //onKeyPress={this.handleKeyPress.bind(this)}
+            ></input></h1>) :
+              (<h1>CC{this.state.episodeData.episodeNumber} - {this.state.episodeData.title}</h1>)
+          }
         </div>
 
         <div className="hosts grid-element">
@@ -233,9 +290,16 @@ class ComputerChroniclesOriginalEpisodeComponent extends React.Component<Compute
             fieldName2="role"
             maxItems={1}
             fields={this.state.episodeData.randomAccessHost ? [this.state.episodeData.randomAccessHost] : []}
-            canAddOrRemoveFields={this.props.editable}
+            canAddOrRemoveFields={this.state.episodeData.iaIdentifier !== null && this.props.editable}
             onFieldChanged={this.handleRandomAccessHostFieldChanged.bind(this)}
           />
+
+          <div className="spacer"></div>
+
+          <h2>Re-runs</h2>
+          <ul>
+            {this.props.episodeReRuns.map(reRun => <li><a href={`./?ep=${reRun.episodeNumber}`}>{`${reRun.episodeNumber}`}</a> {this.state.episodeData.iaIdentifier && <button onClick={() => this.props.onChangeReRun(this.props.episodeData, reRun)}>move video to this ep</button>}</li>)}
+          </ul>
         </div>
 
 
@@ -254,10 +318,12 @@ class ComputerChroniclesOriginalEpisodeComponent extends React.Component<Compute
         </div>
 
         <VideoPlayer
-          videoId={this.state.episodeData.iaIdentifier ?? null}
-          issues={this.state.episodeData.issues ?? {}}
+          videoId={this.state.episodeData.iaIdentifier ?? this.getReRunIaIdentifier()}
+          issues={this.state.episodeData.iaIdentifier ? (this.state.episodeData.issues ?? {}) : (this.getReRunVideoEp()?.issues ?? {})}
           onIssuesUpdate={this.handleIssuesUpdate.bind(this)}
+          onIaIdentifierUpdate={this.handleIaIdentifierUpdate.bind(this)}
           editable={this.props.editable}
+          videoFromEpisode={videoFromEpisode}
         />
 
         <div className="dates grid-element">
@@ -331,7 +397,7 @@ class ComputerChroniclesOriginalEpisodeComponent extends React.Component<Compute
           />
           <h2>Random Access bullet points (one per line)</h2>
           <textarea
-            readOnly={!this.props.editable}
+            readOnly={!(this.state.episodeData.iaIdentifier !== null && this.props.editable)}
             value={this.state.randomAccessText}
             onChange={this.handleRandomAccessChange.bind(this)}
           />

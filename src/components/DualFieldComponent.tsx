@@ -1,6 +1,6 @@
 import React, { ChangeEvent, Component, MouseEvent, RefObject } from 'react';
 
-type TwoStringValuesObject<T, I extends keyof T, J extends keyof T> =
+type TwoStringValuesObject<T extends { [key: string]: string; }, I extends keyof T, J extends keyof T> =
     ({ [P in I]?: string; } & { [P in J]: string; }) |
     ({ [P in I]: string; } & { [P in J]?: string; });
 
@@ -43,8 +43,8 @@ class DualFieldComponent<ObjectType extends TwoStringValuesObject<ObjectType, Fi
             value2: ""
         };
         if (props.className) this.className = `${this.className} ${props.className}`;
-        this.textInputId1 = `${this.props.name}-${this.props.fieldName1}`;
-        this.textInputId2 = `${this.props.name}-${this.props.fieldName2}`;
+        this.textInputId1 = `${this.props.name}-${this.props.fieldName1 as any}`;
+        this.textInputId2 = `${this.props.name}-${this.props.fieldName2 as any}`;
 
         this.textInput1 = React.createRef();
         this.textInput2 = React.createRef();
@@ -92,7 +92,7 @@ class DualFieldComponent<ObjectType extends TwoStringValuesObject<ObjectType, Fi
             (field, idx) => {
                 let separator: string = "";
                 if (field[this.props.fieldName1] && field[this.props.fieldName2]) {
-                    separator = " | "
+                    separator = " | ";
                 }
                 return (<div><b>{field[this.props.fieldName1]}</b>{separator}{field[this.props.fieldName2]} {this.props.canAddOrRemoveFields && (<button
                     className="tag-delete-x"

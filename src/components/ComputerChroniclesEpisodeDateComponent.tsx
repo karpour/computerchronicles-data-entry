@@ -39,10 +39,10 @@ export default class ComputerChroniclesEpisodeDateComponent extends Component<Co
 
                 let currentSeason = episode.episodeNumber - (episode.episodeNumber % 100);
 
-                let seasonChange = false;
-                if (lastSeason !== currentSeason && episode.episodeNumber != 101) {
-                    seasonChange = true;
-                }
+                //let seasonChange = false;
+                //if (lastSeason !== currentSeason && episode.episodeNumber !== 101) {
+                //    seasonChange = true;
+                //}
 
                 lastSeason = currentSeason;
                 let dateUnsure: boolean = false;
@@ -65,7 +65,7 @@ export default class ComputerChroniclesEpisodeDateComponent extends Component<Co
                     daysSinceLastEpisode = getDayDifference(lastDate, currentDate);
                     if (daysSinceLastEpisode <= 0) {
                         daysClasses = `days-0-or-fewer`;
-                    } else if (daysSinceLastEpisode == 7) {
+                    } else if (daysSinceLastEpisode === 7) {
                         daysClasses = `days-7`;
                     } else {
                         daysClasses = `days-other`;

@@ -1,9 +1,10 @@
 import { Component } from "react";
 import ComputerChroniclesEpisodeApiClient from "./ccapi/ComputerChroniclesEpisodeApiClient";
-import { ComputerChroniclesEpisodeMetadata } from "./ccapi/ComputerChroniclesEpisodeMetadata";
+import { ComputerChroniclesEpisodeIndex, ComputerChroniclesEpisodeMetadata, ComputerChroniclesOriginalEpisodeMetadata, ComputerChroniclesRerunEpisodeMetadata } from "./ccapi/ComputerChroniclesEpisodeMetadata";
 import ComputerChroniclesEpisodeDateComponent from "./components/ComputerChroniclesEpisodeDateComponent";
 import ComputerChroniclesEpisodeListComponent from "./components/ComputerChroniclesEpisodeListComponent";
 import ComputerChroniclesOriginalEpisodeComponent from "./components/ComputerChroniclesOriginalEpisodeComponent";
+import ComputerChroniclesUnknownReRunComponent from "./components/ComputerChroniclesUnknownReRunComponent";
 import LoginComponent from "./components/LoginComponent";
 import isPositiveInteger from "./isPositiveInteger";
 
@@ -17,7 +18,7 @@ enum Page {
 }
 
 type ApiState = {
-    editingEpisode: number | null;
+    editingEpisode: ComputerChroniclesEpisodeMetadata | null;
     episodes: ComputerChroniclesEpisodeMetadata[];
     episodeIndex: ComputerChroniclesEpisodeIndex;
     loggedIn: boolean;
@@ -27,7 +28,10 @@ type ApiState = {
     page: Page,
 };
 
-type ComputerChroniclesEpisodeIndex = { [key: number]: ComputerChroniclesEpisodeMetadata | undefined; };
+export function getReRuns(episodeNumber: number, episodeList: ComputerChroniclesEpisodeMetadata[]): ComputerChroniclesRerunEpisodeMetadata[] {
+    return episodeList.filter((ep: ComputerChroniclesEpisodeMetadata) => ep.isReRun && (ep.reRunOf === episodeNumber)) as ComputerChroniclesRerunEpisodeMetadata[];
+}
+
 
 function convertEpisodesToIndexedArray(episodes: ComputerChroniclesEpisodeMetadata[]): ComputerChroniclesEpisodeIndex {
     const episodeIndex: ComputerChroniclesEpisodeIndex = {};
@@ -77,10 +81,7 @@ class App extends Component<ApiProps, ApiState> {
             $_GET[decodeURIComponent(temp[0])] = decodeURIComponent(temp[1]);
         }
         if ($_GET.ep) {
-            let epNum = parseInt($_GET.ep);
-            if (isPositiveInteger(epNum)) {
-                this.setEditedEpisode(epNum);
-            }
+            this.setEditedEpisodeByNumber(parseInt($_GET.ep));
         } else if ($_GET.dates) {
             this.setState({ editingEpisode: null, page: Page.DATE_LIST });
         } else {
@@ -122,15 +123,27 @@ class App extends Component<ApiProps, ApiState> {
     public handleSaveEpisode(episode: ComputerChroniclesEpisodeMetadata): Promise<any> {
         console.log(`Saved Episode`);
         console.log(episode);
-        return this.api.saveEpisode(episode);
+        this.setState({ editingEpisode: episode });
+        return this.api.saveEpisode(episode).then(() => this.reloadApiData());
     }
 
-    public setEditedEpisode(episodeNumber: number) {
+    public setEditedEpisodeByNumber(episodeNumber: number) {
+        if (isPositiveInteger(episodeNumber)) {
+            const episode = this.state.episodeIndex[episodeNumber];
+            if (episode) {
+                this.setEditedEpisode(episode);
+            } else {
+                console.error(`Episode ${episodeNumber} does not exist`);
+            }
+        }
+    }
+
+    public setEditedEpisode(episode: ComputerChroniclesEpisodeMetadata) {
+        const episodeNumber = episode.episodeNumber;
         console.log(`Selected episode ${episodeNumber}`);
-        let episode = this.state.episodeIndex[episodeNumber];
         if (episode) {
             window.history.pushState(episodeNumber, `CC${episodeNumber} - ${episode.isReRun ? "ReRun" : episode.title}`, `/?ep=${episodeNumber}`);
-            this.setState({ editingEpisode: episodeNumber, page: Page.EDITING });
+            this.setState({ editingEpisode: episode, page: Page.EDITING });
         } else {
             console.error(`Episode ${episodeNumber} not found`);
             console.log(episode);
@@ -142,10 +155,33 @@ class App extends Component<ApiProps, ApiState> {
         this.setState({ editingEpisode: null, page: Page.MAIN });
     }
 
-    public render() {
-        //console.log(this.state);
-        let content!: JSX.Element | JSX.Element[];
+    public async handleChangeReRun(sourceEpisode: ComputerChroniclesOriginalEpisodeMetadata, reRunEpisode: ComputerChroniclesRerunEpisodeMetadata): Promise<boolean> {
+        if (window.confirm(`Video file and random access will be moved from episode CC${sourceEpisode.episodeNumber} to CC${reRunEpisode.episodeNumber}`)) {
+            console.log(`Changing target ep iaIdentifier from ${reRunEpisode.iaIdentifier} to ${sourceEpisode.iaIdentifier}`);
+            reRunEpisode.iaIdentifier = sourceEpisode.iaIdentifier;
+            sourceEpisode.iaIdentifier = null;
+            reRunEpisode.randomAccess = sourceEpisode.randomAccess;
+            sourceEpisode.randomAccess = null;
+            reRunEpisode.issues = sourceEpisode.issues;
+            sourceEpisode.issues = {};
+            reRunEpisode.randomAccessHost = sourceEpisode.randomAccessHost;
+            sourceEpisode.randomAccess = [];
+            try {
+                await this.api.saveEpisode(sourceEpisode);
+                await this.api.saveEpisode(reRunEpisode);
+                await this.reloadApiData();
+            } catch (err: any) {
+                alert(err.message);
+                console.error(err.message);
+                return false;
+            }
+            return true;
+        } else {
+            return false;
+        }
+    }
 
+    public render() {
         const loginComponent = <LoginComponent
             loggedIn={this.state.loggedIn}
             userName={this.state.userName}
@@ -168,29 +204,53 @@ class App extends Component<ApiProps, ApiState> {
                         <label htmlFor="show-reruns">Show Re-Runs</label>
                     </div>
                     <ComputerChroniclesEpisodeListComponent
+                        allEpisodes={this.state.episodes}
                         episodeList={this.state.showReRuns ? this.state.episodes : this.state.episodes.filter(ep => !ep.isReRun)}
-                        onSelectEpisode={this.setEditedEpisode.bind(this)}
+                        onSelectEpisode={this.setEditedEpisodeByNumber.bind(this)}
+                        episodeIndex={this.state.episodeIndex}
                     />
                 </div>;
 
             case Page.EDITING:
-                const episodeData = this.state.episodeIndex[this.state.editingEpisode ?? 101];
+                const episodeData = this.state.editingEpisode;
                 if (episodeData) {
                     if (episodeData.isReRun) {
-                        return <div className="main-editing">
-                            {loginComponent}
-                            <span>Re-run</span>;
-                        </div>;
-
+                        if (episodeData.reRunOf) {
+                            return "";
+                            /*return <div className="main-editing">
+                                {loginComponent}
+                                <ComputerChroniclesReRunEpisodeComponent
+                                    episodeData={episodeData}
+                                    originalEpisode={this.state.episodeIndex[episodeData.reRunOf]}
+                                    editable={this.state.loggedIn}
+                                    onCancel={this.handleCancel.bind(this)}
+                                    tags={this.state.tags}
+                                    onSaveEpisodeData={this.handleSaveEpisode.bind(this)}
+                                />
+                            </div>;*/
+                        } else {
+                            return <div className="main-editing">
+                                {loginComponent}
+                                <ComputerChroniclesUnknownReRunComponent
+                                    episodeData={episodeData}
+                                    onCancel={this.handleCancel.bind(this)}
+                                    onSaveEpisodeData={this.handleSaveEpisode.bind(this)}
+                                    editable={this.state.loggedIn}
+                                    episodeNumbers={this.state.episodes.filter(ep => !ep.isReRun).map(ep => ep.episodeNumber)}
+                                />
+                            </div>;
+                        }
                     } else {
                         return <div className="main-editing">
                             {loginComponent}
                             <ComputerChroniclesOriginalEpisodeComponent
                                 episodeData={episodeData}
+                                episodeReRuns={getReRuns(episodeData.episodeNumber, this.state.episodes)}
                                 editable={this.state.loggedIn}
                                 onCancel={this.handleCancel.bind(this)}
                                 onSaveEpisodeData={this.handleSaveEpisode.bind(this)}
                                 tags={this.state.tags}
+                                onChangeReRun={this.handleChangeReRun.bind(this)}
                             />
                         </div>;
                     }
@@ -206,7 +266,7 @@ class App extends Component<ApiProps, ApiState> {
                     </header>
                     <ComputerChroniclesEpisodeDateComponent
                         episodeList={this.state.episodes}
-                        onSelectEpisode={this.setEditedEpisode.bind(this)}
+                        onSelectEpisode={this.setEditedEpisodeByNumber.bind(this)}
                     />
                 </div>;
         }
