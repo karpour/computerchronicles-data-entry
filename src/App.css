@@ -153,6 +153,34 @@ select {
     color: yellow;
 }
 
+.episode-audio-issues::after {
+    content: "[AUDIO ISSUES]";
+    font-weight: bold;
+    font-size: 0.5em;
+    margin-left: 1em;
+    color: yellow;
+}
+
+.episode-noaudio::after {
+    content: "[NO AUDIO]";
+    font-weight: bold;
+    font-size: 0.5em;
+    margin-left: 1em;
+    color: yellow;
+}
+
+.episode-video-issues::after {
+    content: "[VIDEO ISSUES]";
+    font-weight: bold;
+    font-size: 0.5em;
+    margin-left: 1em;
+    color: yellow;
+}
+
+
+
+
+
 .episode-list-item:hover {
     background-color: var(--element-background-lighter);
 }
@@ -479,4 +507,8 @@ iframe {
 .login-header input,
 .login-header form button {
     margin-left: 0.5em;
+}
+
+#orignal-website-input {
+  width: 100%;
 }

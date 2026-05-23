@@ -7,6 +7,7 @@ import ComputerChroniclesOriginalEpisodeComponent from "./components/ComputerChr
 import ComputerChroniclesUnknownReRunComponent from "./components/ComputerChroniclesUnknownReRunComponent";
 import LoginComponent from "./components/LoginComponent";
 import isPositiveInteger from "./isPositiveInteger";
+import ComputerChroniclesReRunEpisodeComponent from "./components/ComputerChroniclesReRunEpisodeComponent";
 
 
 type ApiProps = {};
@@ -155,7 +156,7 @@ class App extends Component<ApiProps, ApiState> {
         this.setState({ editingEpisode: null, page: Page.MAIN });
     }
 
-    public async handleChangeReRun(sourceEpisode: ComputerChroniclesOriginalEpisodeMetadata, reRunEpisode: ComputerChroniclesRerunEpisodeMetadata): Promise<boolean> {
+    public async handleChangeReRun(sourceEpisode: ComputerChroniclesEpisodeMetadata, reRunEpisode: ComputerChroniclesRerunEpisodeMetadata): Promise<boolean> {
         if (window.confirm(`Video file and random access will be moved from episode CC${sourceEpisode.episodeNumber} to CC${reRunEpisode.episodeNumber}`)) {
             console.log(`Changing target ep iaIdentifier from ${reRunEpisode.iaIdentifier} to ${sourceEpisode.iaIdentifier}`);
             reRunEpisode.iaIdentifier = sourceEpisode.iaIdentifier;
@@ -196,8 +197,9 @@ class App extends Component<ApiProps, ApiState> {
                     <header className="episode-list-header">
                         <p>Welcome to the Computer Chronicles Archiving project!<br />
                             This project aims to once and for all complete all metadata for the Computer Chronicles.</p>
-                        <p><b>Want to participate?</b> Join the <a href="https://discord.gg/STPwnYqcnW">discord server</a> or write an <a href="mailto:computerchronicles@thomasnovotny.com">e-mail</a>.</p>
+                        <p><b>Want to participate?</b> Join the <a href="https://discord.gg/STPwnYqcnW">discord server</a> or write an <a href="mailto:computerchronicles@ohnitsch.net">e-mail</a>.</p>
                         <p>The entire dataset is available here: <a href="computerchronicles_metadata.json">JSON</a> <a href="computerchronicles_metadata.ndjson">NDJSON</a></p>
+                        <p>List of <a href="brokenepisodes">broken/missing episodes</a></p>
                     </header>
                     <div className="episode-list-item">
                         <input type="checkbox" name="show-reruns" id="show-reruns" checked={this.state.showReRuns} onChange={() => { this.setState({ showReRuns: !this.state.showReRuns }); }}></input>
@@ -216,18 +218,20 @@ class App extends Component<ApiProps, ApiState> {
                 if (episodeData) {
                     if (episodeData.isReRun) {
                         if (episodeData.reRunOf) {
-                            return "";
-                            /*return <div className="main-editing">
+                            return <div className="main-editing">
                                 {loginComponent}
                                 <ComputerChroniclesReRunEpisodeComponent
                                     episodeData={episodeData}
-                                    originalEpisode={this.state.episodeIndex[episodeData.reRunOf]}
+                                    originalEpisodeData={this.state.episodeIndex[episodeData.reRunOf] as ComputerChroniclesOriginalEpisodeMetadata}
                                     editable={this.state.loggedIn}
                                     onCancel={this.handleCancel.bind(this)}
                                     tags={this.state.tags}
                                     onSaveEpisodeData={this.handleSaveEpisode.bind(this)}
+                                    originalEpisodeReRuns={getReRuns(episodeData.episodeNumber, this.state.episodes)}
+                                    onChangeReRun={this.handleChangeReRun.bind(this)}
+
                                 />
-                            </div>;*/
+                            </div>;
                         } else {
                             return <div className="main-editing">
                                 {loginComponent}

@@ -1,6 +1,6 @@
 import '../App.css';
 import VideoPlayer from './VideoPlayer';
-import React, { ChangeEvent } from 'react';
+import React, { ChangeEvent, createRef } from 'react';
 import TagComponent from './TagComponent';
 import DualFieldComponent from './DualFieldComponent';
 import {
@@ -32,15 +32,19 @@ type ComputerChroniclesOriginalEpisodeComponentState = {
 };
 
 class ComputerChroniclesOriginalEpisodeComponent extends React.Component<ComputerChroniclesOriginalEpisodeComponentProps, ComputerChroniclesOriginalEpisodeComponentState> {
+  private originalWebsiteInputRef;
+
 
   public constructor(props: ComputerChroniclesOriginalEpisodeComponentProps) {
     super(props);
     this.state = {
       episodeData: props.episodeData,
-      selectedStatus: "",
+      selectedStatus: props.episodeData.status ?? "",
       savedSuccess: false,
       randomAccessText: props.episodeData.randomAccess ? props.episodeData.randomAccess.join('\n') : ""
     };
+    this.originalWebsiteInputRef = createRef<HTMLInputElement>();
+
   }
 
   private getReRunVideoEp(): ComputerChroniclesRerunEpisodeMetadata | null {
@@ -187,6 +191,12 @@ class ComputerChroniclesOriginalEpisodeComponent extends React.Component<Compute
     this.setState({ selectedStatus: e.target.value as any });
   }
 
+  protected handleOriginalWebsiteChange(e: ChangeEvent<HTMLInputElement>) {
+    const originalUrl = e.target.value !== "" ? e.target.value : null;
+    console.log(`originalUrl set to "${originalUrl}"`);
+    this.setEpisodeState({ originalUrl });
+  }
+
   protected handleSave() {
     const randomAccess = this.state.randomAccessText ? this.state.randomAccessText.split('\n').map(item => item.trim()).filter(item => item !== "") : null;
     this.setEpisodeState({
@@ -300,6 +310,22 @@ class ComputerChroniclesOriginalEpisodeComponent extends React.Component<Compute
           <ul>
             {this.props.episodeReRuns.map(reRun => <li><a href={`./?ep=${reRun.episodeNumber}`}>{`${reRun.episodeNumber}`}</a> {this.state.episodeData.iaIdentifier && <button onClick={() => this.props.onChangeReRun(this.props.episodeData, reRun)}>move video to this ep</button>}</li>)}
           </ul>
+
+          <h2>Original Website</h2>
+          {this.props.editable && <input type="text"
+            id="orignal-website-input"
+            placeholder="Original website url"
+            value={this.state.episodeData.originalUrl ?? ""}
+            onChange={this.handleOriginalWebsiteChange.bind(this)}
+            ref={this.originalWebsiteInputRef}
+          ></input>
+          }
+          {
+            this.state.episodeData.originalUrl
+            && <a href={this.state.episodeData.originalUrl} target='_blank'>Episode Website</a>
+            || <span>No website</span>
+          }
+
         </div>
 
 

@@ -39,7 +39,7 @@ export type ComputerChroniclesOriginalEpisodeMetadata = {
     iaIdentifier: string | null,
     issues?: ComputerChroniclesEpisodeIssues;
     title: string,
-    episodeNumber: ComputerChroniclesEpisodeNumber,
+    episodeNumber: number,
     isReRun: false,
     airingDate: string,
     productionDate: string,
@@ -55,14 +55,15 @@ export type ComputerChroniclesOriginalEpisodeMetadata = {
     randomAccessHost: ComputerChroniclesGuest | null,
     editedBy?: string;
     notes?: string;
+    originalUrl?: string | null;
 };
 
 export type ComputerChroniclesRerunEpisodeMetadata = {
     issues?: ComputerChroniclesEpisodeIssues;
     iaIdentifier: string | null,
-    episodeNumber: ComputerChroniclesEpisodeNumber,
+    episodeNumber: number,
     isReRun: true,
-    reRunOf: ComputerChroniclesEpisodeNumber | null,
+    reRunOf: number | null,
     productionDate: string,
     airingDate: string,
     status: ComputerChroniclesEpisodeStatus;
@@ -70,6 +71,7 @@ export type ComputerChroniclesRerunEpisodeMetadata = {
     randomAccessHost: ComputerChroniclesGuest | null,
     editedBy?: string;
     notes?: string;
+    originalUrl?: string | null;
 };
 
 
